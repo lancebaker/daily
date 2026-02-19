@@ -691,6 +691,7 @@
                 this.answers = {};
                 this.checkInDate = new Date(); // Default to today
                 this.dateSelected = false;
+                this.isSubmitting = false; // Guard against double submission
                 this.init();
             }
            
@@ -1089,6 +1090,13 @@
             }
            
             async finishCheckIn() {
+                // Prevent double submission
+                if (this.isSubmitting) {
+                    console.log('Already submitting, ignoring duplicate call');
+                    return;
+                }
+                
+                this.isSubmitting = true;
                 this.saveCurrentAnswer();
                
                 document.getElementById('progressFill').style.width = '100%';
@@ -1101,6 +1109,9 @@
                 this.updateStreak();
                
                 this.showCompletionScreen(false);
+                
+                // Reset submission flag after completion
+                this.isSubmitting = false;
             }
            
             async sendToGoogleSheets() {
