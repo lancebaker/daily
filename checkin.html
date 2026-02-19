@@ -689,28 +689,74 @@
                
                 this.currentQuestion = 0;
                 this.answers = {};
+                this.checkInDate = new Date(); // Default to today
+                this.dateSelected = false;
                 this.init();
             }
            
             init() {
                 this.updateDate();
-                this.checkIfCompletedToday();
-                this.renderQuestion();
+                this.showDateSelection();
+            }
+            
+            showDateSelection() {
+                const content = document.getElementById('appContent');
+                const today = new Date().toISOString().split('T')[0];
+                
+                content.innerHTML = `
+                    <div class="question-container">
+                        <div class="question">
+                            <div class="question-text" style="text-align: center; margin-bottom: 30px;">
+                                When would you like to check in for?
+                            </div>
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <input type="date" 
+                                       id="checkInDatePicker" 
+                                       value="${today}"
+                                       max="${today}"
+                                       style="padding: 15px 20px; font-size: 1rem; border: 1.5px solid var(--border); background: rgba(255, 255, 255, 0.8); color: var(--text-dark); font-family: 'Lora', serif; border-radius: 2px; cursor: pointer;">
+                            </div>
+                            <div style="text-align: center; color: var(--text-muted); font-size: 0.9rem; font-style: italic; margin-bottom: 20px;">
+                                Select today for your current check-in, or choose a past date to fill in a missed day
+                            </div>
+                        </div>
+                    </div>
+                    <div class="navigation" style="justify-content: center;">
+                        <button class="nav-btn primary" onclick="app.confirmDate()">
+                            Continue
+                        </button>
+                    </div>
+                `;
+            }
+            
+            confirmDate() {
+                const dateInput = document.getElementById('checkInDatePicker');
+                this.checkInDate = new Date(dateInput.value + 'T12:00:00'); // Set to noon to avoid timezone issues
+                this.dateSelected = true;
+                
+                // Check if already completed for this date
+                this.checkIfCompletedForDate();
+            }
+            
+            checkIfCompletedForDate() {
+                const selectedDateString = this.checkInDate.toDateString();
+                const lastCompleted = localStorage.getItem('lastCompletedDate');
+                
+                if (lastCompleted === selectedDateString) {
+                    if (confirm('You already completed a check-in for this date. Do you want to do it again?')) {
+                        this.renderQuestion();
+                    } else {
+                        this.showDateSelection();
+                    }
+                } else {
+                    this.renderQuestion();
+                }
             }
            
             updateDate() {
                 const now = new Date();
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
-            }
-           
-            checkIfCompletedToday() {
-                const lastCompleted = localStorage.getItem('lastCompletedDate');
-                const today = new Date().toDateString();
-               
-                if (lastCompleted === today) {
-                    this.showCompletionScreen(true);
-                }
             }
            
             renderQuestion() {
@@ -1049,8 +1095,8 @@
                
                 await this.sendToGoogleSheets();
                
-                const today = new Date().toDateString();
-                localStorage.setItem('lastCompletedDate', today);
+                const selectedDateString = this.checkInDate.toDateString();
+                localStorage.setItem('lastCompletedDate', selectedDateString);
                
                 this.updateStreak();
                
@@ -1063,7 +1109,7 @@
                     
                     const formattedData = {
                         timestamp: new Date().toISOString(),
-                        date: new Date().toLocaleDateString('en-US'),
+                        date: this.checkInDate.toLocaleDateString('en-US'), // Use selected date
                         liftToday: this.getAnswer(1, 'yesno'),
                         meditation: this.getAnswer(2, 'yesno'),
                         readToday: this.getAnswer(3, 'yesno'),
