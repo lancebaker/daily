@@ -1542,6 +1542,41 @@
         
         // HISTORY TAB FUNCTIONS
         
+        function calculateOverallHealth(data) {
+            if (data.length === 0) return { percentage: 0, weekCount: 0, avgScore: 0 };
+            
+            // Group data by week
+            const weeklyData = {};
+            data.forEach(entry => {
+                try {
+                    const entryDate = new Date(entry.date);
+                    const weekStart = getWeekStart(entryDate);
+                    const weekKey = weekStart.toISOString().split('T')[0];
+                    
+                    if (!weeklyData[weekKey]) weeklyData[weekKey] = [];
+                    weeklyData[weekKey].push(entry);
+                } catch (e) {}
+            });
+            
+            // Calculate score for each week
+            const weeklyScores = Object.values(weeklyData).map(weekEntries => {
+                const score = calculateScore(weekEntries);
+                return score.points;
+            });
+            
+            // Calculate average
+            const totalScore = weeklyScores.reduce((sum, score) => sum + score, 0);
+            const avgScore = weeklyScores.length > 0 ? totalScore / weeklyScores.length : 0;
+            const percentage = Math.round((avgScore / TOTAL_POINTS) * 100);
+            
+            return {
+                percentage: percentage,
+                weekCount: weeklyScores.length,
+                avgScore: avgScore.toFixed(1),
+                totalWeeks: weeklyScores.length
+            };
+        }
+        
         function changeMonth(direction) {
             currentHistoryMonth.setMonth(currentHistoryMonth.getMonth() + direction);
             renderHistory();
@@ -1597,9 +1632,48 @@
                 if (entry.gatewayTapes === 'Yes') monthlyStats.gatewayTapes++;
                 if (entry.artJournal === 'Yes') monthlyStats.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) monthlyStats.gratitude++;
+                
+                // Count goal priorities
+                const hasGoalRating = [
+                    entry.goal1_songCircle, entry.goal2_recordOriginal,
+                    entry.goal3_songMeditations, entry.goal4_youtubePlaylist,
+                    entry.goal5_humanAlchemy, entry.goal6_storytellingMeditation,
+                    entry.goalOther_rating
+                ].some(rating => rating && rating > 0);
+                if (hasGoalRating) monthlyStats.goalPriorities++;
+                
+                // Count mostImportant
+                if (entry.mostImportant && entry.mostImportant.trim()) monthlyStats.mostImportant++;
             });
             
+            // Calculate overall health across all data
+            const overallHealth = calculateOverallHealth(globalData);
+            const overallTreeState = getTreeState(overallHealth.percentage);
+            
             const html = `
+                <!-- Overall Garden Health Card -->
+                <div class="card" style="margin-bottom: 40px;">
+                    <h2 style="margin-bottom: 10px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400; text-align: center;">
+                        Overall Garden Health
+                    </h2>
+                    <p style="color: #8a7d75; font-size: 0.9rem; margin-bottom: 20px; font-style: italic; text-align: center;">
+                        Based on ${overallHealth.totalWeeks} weeks of practice
+                    </p>
+                    
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <div style="font-size: 3rem; font-weight: 600; color: #9e7f61; font-family: 'Crimson Pro', serif;">
+                            ${overallHealth.avgScore}<span style="font-size: 1.5rem; color: #a8b5a0;">/47</span>
+                        </div>
+                        <div style="font-size: 1rem; color: #8a7d75; margin-top: 5px;">Average Weekly Score</div>
+                        <div style="font-size: 0.9rem; color: #a8b5a0; margin-top: 3px;">${overallHealth.percentage}% Overall</div>
+                    </div>
+                    
+                    <div class="tree-container" style="margin-top: 20px; margin-bottom: 0;">
+                        ${renderTree(overallTreeState)}
+                        <div class="tree-message" style="margin-top: 20px;">${overallTreeState.message}</div>
+                    </div>
+                </div>
+                
                 <div class="card">
                     <h2 style="margin-bottom: 10px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400;">
                         ${monthNames[month]} Overview
@@ -1872,6 +1946,18 @@
                 if (entry.gatewayTapes === 'Yes') totals.gatewayTapes++;
                 if (entry.artJournal === 'Yes') totals.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) totals.gratitude++;
+                
+                // Count goal priorities
+                const hasGoalRating = [
+                    entry.goal1_songCircle, entry.goal2_recordOriginal,
+                    entry.goal3_songMeditations, entry.goal4_youtubePlaylist,
+                    entry.goal5_humanAlchemy, entry.goal6_storytellingMeditation,
+                    entry.goalOther_rating
+                ].some(rating => rating && rating > 0);
+                if (hasGoalRating) totals.goalPriorities++;
+                
+                // Count mostImportant
+                if (entry.mostImportant && entry.mostImportant.trim()) totals.mostImportant++;
             });
             
             // Calculate monthly averages
