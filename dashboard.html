@@ -677,24 +677,28 @@
         
         const GOALS = {
             liftToday: 2,
-            meditation: 7,       // Changed from meditation
+            meditation: 7,
             readToday: 7,
-            course: 7,
+            course: 3,              // Changed from 7 to 3
             instrument: 3,
-            gatewayTapes: 2,
+            gatewayTapes: 3,        // Changed from 2 to 3
             artJournal: 1,
-            gratitude: 7
+            gratitude: 7,
+            goalPriorities: 7,      // NEW
+            mostImportant: 7        // NEW
         };
         
         const LABELS = {
             liftToday: 'Lifting',
-            meditation: 'Meditation',  // Changed from HeartMath
+            meditation: 'Meditation',
             readToday: 'Reading',
             course: 'Course',
             instrument: 'Instrument',
             gatewayTapes: 'Gateway Tapes',
             artJournal: 'Art Journal',
-            gratitude: 'Gratitude'
+            gratitude: 'Gratitude',
+            goalPriorities: 'Goal Priorities',
+            mostImportant: 'Most Important'
         };
         
         const GOAL_NAMES = {
@@ -706,7 +710,7 @@
             goal6_storytellingMeditation: 'Storytelling Meditation'
         };
         
-        const TOTAL_POINTS = 36;
+        const TOTAL_POINTS = 47;  // Updated from 36
         
         let globalData = [];
         let currentHistoryMonth = new Date();
@@ -749,7 +753,7 @@
                 <!-- Consolidated Top Section: Score, Streak, and Visualization -->
                 <div class="card">
                     <div class="score-display">
-                        <div class="score-number">${score.points}/<small>36</small></div>
+                        <div class="score-number">${score.points}/<small>47</small></div>
                         <div class="score-label">This Week's Score</div>
                         <div class="score-percentage">${score.percentage}% Complete</div>
                     </div>
@@ -994,20 +998,7 @@
                 return;
             }
             
-            // Extract keywords for word cloud
-            const keywords = extractKeywords(gratitudeEntries.map(e => e.text));
-            
             const html = `
-                <div class="card">
-                    <h2 style="margin-bottom: 15px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400;">
-                        Gratitude Themes
-                    </h2>
-                    <p style="color: #8a7d75; font-size: 0.9rem; margin-bottom: 20px; font-style: italic;">
-                        Key words from your gratitude practice
-                    </p>
-                    ${renderWordCloud(keywords)}
-                </div>
-                
                 <div class="card">
                     <h2 style="margin-bottom: 15px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400;">
                         Gratitude Journal
@@ -1213,13 +1204,15 @@
         function calculateScore(weekData) {
             const counts = {
                 liftToday: 0,
-                meditation: 0,  // Changed from meditation
+                meditation: 0,
                 readToday: 0,
                 course: 0,
                 instrument: 0,
                 gatewayTapes: 0,
                 artJournal: 0,
-                gratitude: 0
+                gratitude: 0,
+                goalPriorities: 0,
+                mostImportant: 0
             };
             
             weekData.forEach(entry => {
@@ -1231,6 +1224,22 @@
                 if (entry.gatewayTapes === 'Yes') counts.gatewayTapes++;
                 if (entry.artJournal === 'Yes') counts.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) counts.gratitude++;
+                
+                // Count if ANY goal was rated (1-5 stars)
+                const hasGoalRating = [
+                    entry.goal1_songCircle,
+                    entry.goal2_recordOriginal,
+                    entry.goal3_songMeditations,
+                    entry.goal4_youtubePlaylist,
+                    entry.goal5_humanAlchemy,
+                    entry.goal6_storytellingMeditation,
+                    entry.goalOther_rating
+                ].some(rating => rating && rating > 0);
+                
+                if (hasGoalRating) counts.goalPriorities++;
+                
+                // Count if mostImportant was answered
+                if (entry.mostImportant && entry.mostImportant.trim()) counts.mostImportant++;
             });
             
             let totalPoints = 0;
@@ -1263,7 +1272,7 @@
             
             const totals = {
                 liftToday: 0, meditation: 0, readToday: 0, course: 0,
-                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0
+                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, goalPriorities: 0, mostImportant: 0
             };
             
             const weekCount = Object.keys(weeklyData).length;
@@ -1271,7 +1280,7 @@
             Object.values(weeklyData).forEach(weekEntries => {
                 const weekCounts = {
                     liftToday: 0, meditation: 0, readToday: 0, course: 0,
-                    instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0
+                    instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, goalPriorities: 0, mostImportant: 0
                 };
                 
                 weekEntries.forEach(entry => {
@@ -1283,6 +1292,18 @@
                     if (entry.gatewayTapes === 'Yes') weekCounts.gatewayTapes++;
                     if (entry.artJournal === 'Yes') weekCounts.artJournal++;
                     if (entry.gratitude && entry.gratitude.trim()) weekCounts.gratitude++;
+                    
+                    // Count goal priorities if any goal was rated
+                    const hasGoalRating = [
+                        entry.goal1_songCircle, entry.goal2_recordOriginal,
+                        entry.goal3_songMeditations, entry.goal4_youtubePlaylist,
+                        entry.goal5_humanAlchemy, entry.goal6_storytellingMeditation,
+                        entry.goalOther_rating
+                    ].some(rating => rating && rating > 0);
+                    if (hasGoalRating) weekCounts.goalPriorities++;
+                    
+                    // Count mostImportant if answered
+                    if (entry.mostImportant && entry.mostImportant.trim()) weekCounts.mostImportant++;
                 });
                 
                 for (let activity in weekCounts) {
@@ -1839,7 +1860,7 @@
             // Calculate totals
             const totals = {
                 liftToday: 0, meditation: 0, readToday: 0, course: 0,
-                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0
+                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, goalPriorities: 0, mostImportant: 0
             };
             
             yearData.forEach(entry => {
