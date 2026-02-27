@@ -1674,6 +1674,53 @@
                     </div>
                 </div>
                 
+                <!-- Monthly Calendar View -->
+                ${(() => {
+                    const calMonth = currentHistoryMonth.getMonth();
+                    const calYear = currentHistoryMonth.getFullYear();
+                    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+                    const checkedDays = new Set();
+                    
+                    globalData.forEach(entry => {
+                        try {
+                            const entryDate = new Date(entry.date);
+                            if (entryDate.getMonth() === calMonth && entryDate.getFullYear() === calYear) {
+                                checkedDays.add(entryDate.getDate());
+                            }
+                        } catch (e) {}
+                    });
+                    
+                    const isCurrentMonth = calMonth === now.getMonth() && calYear === now.getFullYear();
+                    const currentDay = isCurrentMonth ? now.getDate() : daysInMonth;
+                    
+                    const dotsHtml = [];
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const isChecked = checkedDays.has(day);
+                        const isToday = isCurrentMonth && day === currentDay;
+                        const isFuture = isCurrentMonth && day > currentDay;
+                        
+                        let classes = ['dot'];
+                        if (isChecked) classes.push('checked');
+                        else classes.push('empty');
+                        if (isToday) classes.push('today');
+                        if (isFuture) classes.push('future');
+                        
+                        dotsHtml.push(`<div class="${classes.join(' ')}">${day}</div>`);
+                    }
+                    
+                    return `
+                <div class="card">
+                    <div class="monthly-chart">
+                        <div class="monthly-title">${monthNames[month]} Check-ins</div>
+                        <div class="monthly-subtitle">${checkedDays.size} of ${currentDay} days checked in</div>
+                        <div class="dots-grid">
+                            ${dotsHtml.join('')}
+                        </div>
+                    </div>
+                </div>
+                    `;
+                })()}
+                
                 <div class="card">
                     <h2 style="margin-bottom: 10px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400;">
                         ${monthNames[month]} Overview
