@@ -622,6 +622,7 @@
             <button class="tab active" onclick="switchTab('thisWeek')">This Week</button>
             <button class="tab" onclick="switchTab('history')">History</button>
             <button class="tab" onclick="switchTab('gratitude')">Gratitude</button>
+            <button class="tab" onclick="switchTab('goals')">Goals</button>
             <button class="tab" onclick="switchTab('feels')">Feels</button>
         </div>
         
@@ -651,6 +652,13 @@
         <div id="gratitudeTab" class="tab-content">
             <div id="gratitudeContent">
                 <div class="loading">Loading gratitude entries...</div>
+            </div>
+        </div>
+        
+        <!-- Goals Tab -->
+        <div id="goalsTab" class="tab-content">
+            <div id="goalsContent">
+                <div class="loading">Loading goals...</div>
             </div>
         </div>
         
@@ -723,8 +731,12 @@
                 document.querySelectorAll('.tab')[2].classList.add('active');
                 document.getElementById('gratitudeTab').classList.add('active');
                 renderGratitude();
-            } else if (tabName === 'feels') {
+            } else if (tabName === 'goals') {
                 document.querySelectorAll('.tab')[3].classList.add('active');
+                document.getElementById('goalsTab').classList.add('active');
+                renderGoals();
+            } else if (tabName === 'feels') {
+                document.querySelectorAll('.tab')[4].classList.add('active');
                 document.getElementById('feelsTab').classList.add('active');
                 renderFeels();
             }
@@ -1027,6 +1039,78 @@
             `;
             
             document.getElementById('feelsContent').innerHTML = html;
+        }
+        
+        // GOALS TAB
+        
+        function renderGoals() {
+            const goalsEntries = globalData
+                .filter(entry => entry.personalGoal && entry.personalGoal.trim())
+                .map(entry => {
+                    try {
+                        const date = new Date(entry.date);
+                        return {
+                            date: date.toLocaleDateString('en-US', { 
+                                weekday: 'long', 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            }),
+                            text: entry.personalGoal,
+                            timestamp: date.getTime()
+                        };
+                    } catch (e) {
+                        return null;
+                    }
+                })
+                .filter(e => e !== null)
+                .sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (goalsEntries.length === 0) {
+                document.getElementById('goalsContent').innerHTML = `
+                    <div class="card">
+                        <div class="gratitude-empty">
+                            <div style="font-size: 3rem; margin-bottom: 20px;">🎯</div>
+                            <p>No personal goals yet.</p>
+                            <p style="margin-top: 10px;">Complete a check-in to start tracking your goals.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const keywords = extractKeywords(goalsEntries.map(e => e.text));
+            
+            const html = `
+                <div class="card">
+                    <h2 style="margin-bottom: 15px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400;">
+                        Goal Themes
+                    </h2>
+                    <p style="color: #8a7d75; font-size: 0.9rem; margin-bottom: 20px; font-style: italic;">
+                        Recurring priorities in your practice
+                    </p>
+                    ${renderWordCloud(keywords)}
+                </div>
+                
+                <div class="card">
+                    <h2 style="margin-bottom: 15px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400;">
+                        Personal Goals
+                    </h2>
+                    <p style="color: #8a7d75; font-size: 0.9rem; margin-bottom: 30px; font-style: italic;">
+                        ${goalsEntries.length} goals you're working toward
+                    </p>
+                    <div class="gratitude-entries">
+                        ${goalsEntries.map(entry => `
+                            <div class="gratitude-entry">
+                                <div class="gratitude-date">${entry.date}</div>
+                                <div class="gratitude-text">${entry.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('goalsContent').innerHTML = html;
         }
         
         async function loadData() {
