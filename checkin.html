@@ -690,10 +690,22 @@
                 buttons.forEach(btn => btn.classList.remove('selected'));
                 
                 const question = this.questions[this.currentQuestion];
+                
+                // INSTRUMENT DEBUG
+                if (question.id === 5) {
+                    console.log('=== INSTRUMENT QUESTION ===');
+                    console.log('Clicked:', value ? 'YES' : 'NO');
+                }
+                
                 if (!this.answers[question.id]) {
                     this.answers[question.id] = {};
                 }
                 this.answers[question.id].yesno = value;
+                
+                // INSTRUMENT DEBUG
+                if (question.id === 5) {
+                    console.log('Saved to answers:', this.answers[question.id]);
+                }
                
                 if (value) {
                     buttons[0].classList.add('selected');
@@ -732,10 +744,13 @@
                     }
                 });
 
+                // Don't overwrite existing answer object - just add instruments to it
                 if (!this.answers[question.id]) {
-                    this.answers[question.id] = {};
+                    this.answers[question.id] = { yesno: true }; // Default to true since we're selecting instruments
                 }
                 this.answers[question.id].instruments = selected;
+                
+                console.log('Instrument answer saved:', this.answers[question.id]);
                 
                 if (selected.length > 0) {
                     setTimeout(() => {
@@ -844,10 +859,19 @@
            
             getAnswer(questionId, field) {
                 const answer = this.answers[questionId];
+                
+                if (questionId === 5 && field === 'yesno') {
+                    console.log(`Getting instrument yesno - answer object:`, answer);
+                }
+                
                 if (!answer) return '';
                
                 if (field === 'yesno') {
-                    return answer.yesno === true ? 'Yes' : answer.yesno === false ? 'No' : '';
+                    const result = answer.yesno === true ? 'Yes' : answer.yesno === false ? 'No' : '';
+                    if (questionId === 5) {
+                        console.log(`Instrument yesno result: "${result}"`);
+                    }
+                    return result;
                 }
 
                 if (field === 'instruments') {
