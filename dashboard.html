@@ -1812,6 +1812,46 @@
                             }).join('')}
                         </div>
                     </div>
+                    
+                    ${currentActivity === 'instrument' ? (() => {
+                        const instrumentCounts = {};
+                        globalData.forEach(entry => {
+                            if (entry.instrument === 'Yes' && entry.instrumentsPlayed) {
+                                const instruments = entry.instrumentsPlayed.split(',').map(i => i.trim());
+                                instruments.forEach(inst => {
+                                    instrumentCounts[inst] = (instrumentCounts[inst] || 0) + 1;
+                                });
+                            }
+                        });
+                        
+                        const sortedInstruments = Object.entries(instrumentCounts)
+                            .sort((a, b) => b[1] - a[1]);
+                        
+                        if (sortedInstruments.length === 0) return '';
+                        
+                        return `
+                    <div style="border-top: 1px solid rgba(158, 127, 97, 0.15); padding-top: 25px; margin-top: 25px;">
+                        <h3 style="font-family: 'Crimson Pro', serif; font-size: 1.2rem; color: #6b5d52; margin-bottom: 20px;">
+                            🎸 Instrument Breakdown (All Time)
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            ${sortedInstruments.map(([instrument, count]) => {
+                                const maxCount = Math.max(...sortedInstruments.map(i => i[1]));
+                                const percentage = (count / maxCount) * 100;
+                                return `
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div style="min-width: 100px; font-size: 0.9rem; color: #6b5d52; font-weight: 500;">${instrument}</div>
+                                        <div style="flex: 1; background: rgba(168, 181, 160, 0.2); height: 8px; border-radius: 4px; overflow: hidden;">
+                                            <div style="width: ${percentage}%; height: 100%; background: #a8b5a0; transition: width 0.3s ease;"></div>
+                                        </div>
+                                        <div style="min-width: 40px; text-align: right; font-size: 0.9rem; color: #9e7f61; font-weight: 600;">${count}x</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                        `;
+                    })() : ''}
                 </div>
             `;
             
