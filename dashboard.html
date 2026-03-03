@@ -679,11 +679,13 @@
             liftToday: 2,
             meditation: 7,
             readToday: 7,
-            course: 3,
+            course: 3,              // Changed from 7 to 3
             instrument: 3,
-            gatewayTapes: 3,
+            gatewayTapes: 3,        // Changed from 2 to 3
             artJournal: 1,
-            gratitude: 7
+            gratitude: 7,
+            goalPriorities: 7,      // NEW
+            mostImportant: 7        // NEW
         };
         
         const LABELS = {
@@ -694,10 +696,21 @@
             instrument: 'Instrument',
             gatewayTapes: 'Gateway Tapes',
             artJournal: 'Art Journal',
-            gratitude: 'Gratitude'
+            gratitude: 'Gratitude',
+            goalPriorities: 'Goal Priorities',
+            mostImportant: 'Most Important'
         };
         
-        const TOTAL_POINTS = 33;
+        const GOAL_NAMES = {
+            goal1_songCircle: 'Song Circle Songs',
+            goal2_recordOriginal: 'Record Original Songs',
+            goal3_songMeditations: 'Song Meditations',
+            goal4_youtubePlaylist: 'YouTube Playlist',
+            goal5_humanAlchemy: 'Human Centered Alchemy',
+            goal6_storytellingMeditation: 'Storytelling Meditation'
+        };
+        
+        const TOTAL_POINTS = 35;  // Updated from 36
         
         let globalData = [];
         let currentHistoryMonth = new Date();
@@ -740,7 +753,7 @@
                 <!-- Consolidated Top Section: Score, Streak, and Visualization -->
                 <div class="card">
                     <div class="score-display">
-                        <div class="score-number">${score.points}/<small>33</small></div>
+                        <div class="score-number">${score.points}/<small>35</small></div>
                         <div class="score-label">This Week's Score</div>
                         <div class="score-percentage">${score.percentage}% Complete</div>
                     </div>
@@ -1102,7 +1115,7 @@
                     liftToday: row[2] || '',
                     meditation: row[3] || '',  // Changed from meditation
                     readToday: row[4] || '',
-                    course: row[5] || '',  // Maps to 'course' in new data
+                    probabilityCourse: row[5] || '',  // Maps to 'course' in new data
                     instrument: row[6] || '',
                     instrumentsPlayed: row[7] || '',
                     gatewayTapes: row[8] || '',

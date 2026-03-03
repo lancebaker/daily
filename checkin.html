@@ -4,22 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f5f1e8">
-    <title>Daily Check-In</title>
-    <link rel="manifest" href="manifest.json">
+    <meta name="description" content="Daily mindfulness check-in">
+    <title>Daily Reflections</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRGFpbHkgUmVmbGVjdGlvbnMiLCJzaG9ydF9uYW1lIjoiUmVmbGVjdCIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZjVmMWU4IiwidGhlbWVfY29sb3IiOiIjZjVmMWU4IiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0F4TWpnZ01USTRJAJQ0OGNtVmpkQ0IzYVdSMGFEMGlNVEk0SWlCb1pXbG5hSFE5SWpFeU9DSWdabWxzYkQwaUkyWTFaakZsT0NJdlBqeGphWEpqYkdVZ1k0RDBJall5SWlCamVUMGlOalFpSUhJOUlqSXdJaUJtYVd4c1BTSWpPV1UzWmpZeElpOCtQQzl6ZG1jKyIsInNpemVzIjoiMTI4eDEyOCIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
-       
-        :root {
-            --cream: #f5f1e8;
-            --warm-white: #fdfcfa;
-            --sage: #9e7f61;
-            --deep-sage: #6b5d52;
-            --soft-green: #a8b5a0;
-            --accent: #d4a574;
-            --text-dark: #3a3330;
-            --text-muted: #8a7d75;
-            --border: rgba(158, 127, 97, 0.15);
-        }
        
         * {
             margin: 0;
@@ -27,43 +16,100 @@
             box-sizing: border-box;
         }
        
+        :root {
+            --cream: #f5f1e8;
+            --warm-white: #fdfcfa;
+            --sage: #9e7f61;
+            --deep-sage: #6b5d52;
+            --soft-green: #a8b5a0;
+            --text-dark: #3a3330;
+            --text-muted: #8a7d75;
+            --accent: #d4a574;
+            --border: rgba(158, 127, 97, 0.15);
+        }
+       
         body {
             font-family: 'Lora', serif;
             background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
             color: var(--text-dark);
             min-height: 100vh;
-            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+       
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 181, 160, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s ease-in-out infinite;
+        }
+       
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 165, 116, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 25s ease-in-out infinite reverse;
         }
        
         .container {
-            width: 100%;
             max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
         }
        
         .card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
-            padding: 40px;
             border-radius: 2px;
+            padding: 60px 50px;
             box-shadow: 0 20px 60px rgba(58, 51, 48, 0.08);
             border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+       
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.3;
         }
        
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 50px;
+            animation: fadeIn 1s ease-out;
         }
        
         .date {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
             font-family: 'Crimson Pro', serif;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-weight: 300;
         }
        
         h1 {
@@ -71,27 +117,31 @@
             font-size: 2.5rem;
             font-weight: 300;
             color: var(--deep-sage);
+            letter-spacing: 1px;
             margin-bottom: 10px;
         }
        
         .subtitle {
-            font-style: italic;
+            font-size: 1rem;
             color: var(--text-muted);
+            font-style: italic;
+            font-weight: 400;
         }
        
         .progress-bar {
-            height: 4px;
+            width: 100%;
+            height: 2px;
             background: var(--border);
             margin-bottom: 40px;
-            border-radius: 2px;
+            position: relative;
             overflow: hidden;
         }
        
         .progress-fill {
             height: 100%;
-            background: var(--sage);
+            background: linear-gradient(90deg, var(--sage), var(--accent));
             width: 0%;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
        
         .question-container {
@@ -102,51 +152,50 @@
         }
        
         .question {
-            text-align: center;
+            opacity: 0;
+            animation: slideIn 0.6s ease-out forwards;
         }
        
         .question-number {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
             font-family: 'Crimson Pro', serif;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
        
         .question-text {
-            font-size: 1.8rem;
-            font-weight: 400;
-            color: var(--deep-sage);
+            font-size: 1.6rem;
+            color: var(--text-dark);
             margin-bottom: 40px;
-            line-height: 1.4;
+            line-height: 1.6;
+            font-weight: 400;
         }
        
         .answer-group {
-            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
        
         .yes-no-container {
             display: flex;
-            gap: 20px;
-            justify-content: center;
+            gap: 15px;
             margin-bottom: 20px;
         }
        
         .answer-btn {
             flex: 1;
-            max-width: 200px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.5);
+            padding: 18px 30px;
+            background: transparent;
             border: 1.5px solid var(--border);
             color: var(--text-dark);
-            font-family: 'Crimson Pro', serif;
-            font-size: 1.2rem;
+            font-family: 'Lora', serif;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 600;
             position: relative;
             overflow: hidden;
         }
@@ -170,6 +219,7 @@
             z-index: 1;
         }
        
+        /* Only apply hover effects on non-touch devices */
         @media (hover: hover) and (pointer: fine) {
             .answer-btn:hover::before {
                 transform: scaleX(1);
@@ -200,17 +250,6 @@
             border: 1.5px solid var(--border);
             border-radius: 2px;
             animation: slideIn 0.4s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .instrument-selector.visible {
@@ -265,14 +304,12 @@
         .text-input-container {
             position: relative;
         }
-        
-        .examples-text {
-            font-size: 0.85rem;
+       
+        .optional-label {
+            font-size: 0.75rem;
             color: var(--text-muted);
+            margin-bottom: 10px;
             font-style: italic;
-            margin-bottom: 15px;
-            text-align: center;
-            line-height: 1.6;
         }
        
         textarea {
@@ -299,6 +336,73 @@
         textarea::placeholder {
             color: var(--text-muted);
             font-style: italic;
+        }
+        
+        /* Goals Rating Styles */
+        .goals-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .goal-item {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1.5px solid var(--border);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .goal-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: var(--sage);
+        }
+        
+        .goal-name {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+        
+        .stars {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .star {
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--border);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .star:hover,
+        .star.filled {
+            color: #d4a574;
+        }
+        
+        .star.filled {
+            transform: scale(1.1);
+        }
+        
+        .goal-other-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1.5px solid var(--border);
+            color: var(--text-dark);
+            font-family: 'Lora', serif;
+            font-size: 0.95rem;
+            margin-top: 10px;
+            border-radius: 2px;
+        }
+        
+        .goal-other-input:focus {
+            outline: none;
+            border-color: var(--sage);
         }
        
         .navigation {
@@ -345,35 +449,35 @@
         .nav-btn.primary:hover:not(:disabled) {
             background: var(--deep-sage);
             border-color: var(--deep-sage);
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(107, 93, 82, 0.2);
         }
-
+       
         .skip-btn {
-            padding: 10px 20px;
-            background: transparent;
+            padding: 0;
+            background: none;
             border: none;
             color: var(--text-muted);
             font-family: 'Lora', serif;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-style: italic;
             text-decoration: underline;
+            transition: color 0.3s ease;
+            font-style: italic;
         }
-
+       
         .skip-btn:hover {
             color: var(--sage);
         }
        
         .completion-screen {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 0;
+            animation: fadeIn 1s ease-out;
         }
        
         .completion-icon {
             font-size: 4rem;
             margin-bottom: 30px;
+            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
        
         .completion-title {
@@ -385,55 +489,132 @@
         }
        
         .completion-message {
+            font-size: 1.1rem;
             color: var(--text-muted);
-            font-style: italic;
-            margin-bottom: 40px;
-            line-height: 1.8;
+            margin-bottom: 30px;
+            line-height: 1.7;
         }
        
-        .streak-display {
+        .streak-info {
             display: inline-block;
-            padding: 20px 40px;
-            background: rgba(168, 181, 160, 0.15);
+            padding: 15px 30px;
+            background: rgba(168, 181, 160, 0.1);
+            border: 1px solid var(--border);
             border-radius: 2px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
        
         .streak-number {
             font-family: 'Crimson Pro', serif;
-            font-size: 3rem;
-            font-weight: 600;
+            font-size: 2rem;
             color: var(--sage);
+            font-weight: 600;
         }
        
         .streak-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 5px;
+        }
+       
+        .reset-btn {
+            padding: 15px 40px;
+            background: transparent;
+            border: 1.5px solid var(--sage);
+            color: var(--sage);
+            font-family: 'Crimson Pro', serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+       
+        .reset-btn:hover {
+            background: var(--sage);
+            color: var(--warm-white);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(158, 127, 97, 0.15);
+        }
+       
+        .webhook-status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(168, 181, 160, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+       
+        .webhook-status.success {
+            background: rgba(168, 181, 160, 0.15);
+            color: var(--soft-green);
+        }
+       
+        .webhook-status.error {
+            background: rgba(212, 165, 116, 0.15);
+            color: var(--accent);
+        }
+       
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+       
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+       
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+       
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(30px, -30px) rotate(5deg);
+            }
+            66% {
+                transform: translate(-20px, 20px) rotate(-5deg);
+            }
         }
        
         @media (max-width: 768px) {
+            .card {
+                padding: 40px 30px;
+            }
+           
             h1 {
                 font-size: 2rem;
             }
            
             .question-text {
-                font-size: 1.4rem;
-            }
-           
-            .card {
-                padding: 30px 20px;
+                font-size: 1.3rem;
             }
            
             .yes-no-container {
                 flex-direction: column;
-                gap: 15px;
-            }
-           
-            .answer-btn {
-                max-width: 100%;
             }
            
             .navigation {
@@ -501,9 +682,9 @@
                
                 this.currentQuestion = 0;
                 this.answers = {};
-                this.checkInDate = new Date();
+                this.checkInDate = new Date(); // Default to today
                 this.dateSelected = false;
-                this.isSubmitting = false;
+                this.isSubmitting = false; // Guard against double submission
                 this.init();
             }
            
@@ -544,8 +725,10 @@
             
             confirmDate() {
                 const dateInput = document.getElementById('checkInDatePicker');
-                this.checkInDate = new Date(dateInput.value + 'T12:00:00');
+                this.checkInDate = new Date(dateInput.value + 'T12:00:00'); // Set to noon to avoid timezone issues
                 this.dateSelected = true;
+                
+                // Check if already completed for this date
                 this.checkIfCompletedForDate();
             }
             
@@ -622,24 +805,61 @@
                         </div>
                         ` : ''}
                     `;
+                } else if (question.type === 'goals') {
+                    // Goals rating question
+                    content.innerHTML = `
+                        <div class="question-container">
+                            <div class="question">
+                                <div class="question-number">Question ${this.currentQuestion + 1} of ${this.questions.length}</div>
+                                <div class="question-text">${question.text}</div>
+                                <div class="answer-group">
+                                    <div class="goals-container">
+                                        ${question.goals.map((goal, index) => `
+                                            <div class="goal-item">
+                                                <div class="goal-name">${goal}</div>
+                                                <div class="stars" id="stars-${index}">
+                                                    ${[1, 2, 3, 4, 5].map(star => `
+                                                        <span class="star" onclick="app.rateGoal(${index}, ${star})" data-value="${star}">★</span>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                        <div class="goal-item">
+                                            <div class="goal-name">Other</div>
+                                            <input type="text" class="goal-other-input" id="goalOtherText" placeholder="Describe your goal..." onchange="app.updateOtherGoal()">
+                                            <div class="stars" id="stars-other" style="margin-top: 12px;">
+                                                ${[1, 2, 3, 4, 5].map(star => `
+                                                    <span class="star" onclick="app.rateGoal('other', ${star})" data-value="${star}">★</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="navigation">
+                            <button class="nav-btn" onclick="app.previousQuestion()">
+                                Back
+                            </button>
+                            <button class="skip-btn" onclick="app.skipQuestion()">Skip question</button>
+                            <button class="nav-btn primary" onclick="app.nextQuestion()">
+                                Continue
+                            </button>
+                        </div>
+                    `;
                 } else {
+                    // Text question (gratitude or importance)
                     const placeholders = {
-                        8: "Share what's on your mind...",
                         9: "Take a moment to reflect...",
                         10: "What's calling for your attention?"
                     };
                     const placeholder = placeholders[question.id] || "Your thoughts...";
-                    
-                    const examplesHtml = question.examples ? `
-                        <div class="examples-text">${question.examples}</div>
-                    ` : '';
                     
                     content.innerHTML = `
                         <div class="question-container">
                             <div class="question">
                                 <div class="question-number">Question ${this.currentQuestion + 1} of ${this.questions.length}</div>
                                 <div class="question-text">${question.text}</div>
-                                ${examplesHtml}
                                 <div class="answer-group">
                                     <div class="text-input-container">
                                         <textarea id="textInput-${question.id}" placeholder="${placeholder}" style="min-height: 150px;"></textarea>
@@ -659,6 +879,7 @@
                     `;
                 }
                
+                // Restore previous answer if exists
                 if (this.answers[question.id]) {
                     const answer = this.answers[question.id];
                     if (question.type === 'yesno' && answer.yesno !== undefined) {
@@ -682,24 +903,77 @@
                         const textInput = document.getElementById(`textInput-${question.id}`);
                         if (textInput) textInput.value = answer.text;
                     }
+                    if (answer.goals && question.type === 'goals') {
+                        // Restore goal ratings
+                        answer.goals.forEach((rating, index) => {
+                            if (rating > 0) {
+                                this.fillStars(index, rating);
+                            }
+                        });
+                        if (answer.otherGoal) {
+                            const otherInput = document.getElementById('goalOtherText');
+                            if (otherInput) otherInput.value = answer.otherGoal;
+                            if (answer.otherRating > 0) {
+                                this.fillStars('other', answer.otherRating);
+                            }
+                        }
+                    }
                 }
+            }
+            
+            rateGoal(goalIndex, rating) {
+                this.fillStars(goalIndex, rating);
+                
+                const question = this.questions[this.currentQuestion];
+                if (!this.answers[question.id]) {
+                    this.answers[question.id] = { goals: [] };
+                }
+                
+                if (goalIndex === 'other') {
+                    this.answers[question.id].otherRating = rating;
+                } else {
+                    if (!this.answers[question.id].goals) {
+                        this.answers[question.id].goals = [];
+                    }
+                    this.answers[question.id].goals[goalIndex] = rating;
+                }
+            }
+            
+            fillStars(goalIndex, rating) {
+                const starsContainer = document.getElementById(`stars-${goalIndex}`);
+                if (!starsContainer) return;
+                
+                const stars = starsContainer.querySelectorAll('.star');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('filled');
+                    } else {
+                        star.classList.remove('filled');
+                    }
+                });
+            }
+            
+            updateOtherGoal() {
+                const otherInput = document.getElementById('goalOtherText');
+                const question = this.questions[this.currentQuestion];
+                
+                if (!this.answers[question.id]) {
+                    this.answers[question.id] = { goals: [] };
+                }
+                
+                this.answers[question.id].otherGoal = otherInput.value.trim();
             }
            
             selectYesNo(value) {
                 const buttons = document.querySelectorAll('.answer-btn');
                 buttons.forEach(btn => btn.classList.remove('selected'));
-                
-                const question = this.questions[this.currentQuestion];
-                if (!this.answers[question.id]) {
-                    this.answers[question.id] = {};
-                }
-                this.answers[question.id].yesno = value;
                
                 if (value) {
                     buttons[0].classList.add('selected');
                     const instrumentSelector = document.getElementById('instrumentSelector');
                     if (instrumentSelector) {
                         instrumentSelector.classList.add('visible');
+                        // Don't auto-advance if there's a sub-question and user said Yes
                         return;
                     }
                 } else {
@@ -708,11 +982,20 @@
                     if (instrumentSelector) {
                         instrumentSelector.classList.remove('visible');
                     }
-                    if (question.hasSubQuestion) {
-                        this.answers[question.id].instruments = [];
-                    }
+                }
+               
+                const question = this.questions[this.currentQuestion];
+                if (!this.answers[question.id]) {
+                    this.answers[question.id] = {};
+                }
+                this.answers[question.id].yesno = value;
+
+                // Clear instruments if switching to No
+                if (!value && question.hasSubQuestion) {
+                    this.answers[question.id].instruments = [];
                 }
 
+                // Auto-advance: if no sub-question OR if sub-question but answered No
                 if (!question.hasSubQuestion || !value) {
                     setTimeout(() => {
                         this.nextQuestion();
@@ -737,6 +1020,7 @@
                 }
                 this.answers[question.id].instruments = selected;
                 
+                // Auto-advance if at least one instrument is selected
                 if (selected.length > 0) {
                     setTimeout(() => {
                         this.nextQuestion();
@@ -754,7 +1038,18 @@
                             text: textInput.value.trim()
                         };
                     }
+                } else if (question.type === 'goals') {
+                    // Goals are already saved via rateGoal() and updateOtherGoal()
+                    // Just make sure otherGoal text is captured
+                    const otherInput = document.getElementById('goalOtherText');
+                    if (otherInput && otherInput.value.trim()) {
+                        if (!this.answers[question.id]) {
+                            this.answers[question.id] = { goals: [] };
+                        }
+                        this.answers[question.id].otherGoal = otherInput.value.trim();
+                    }
                 }
+                // Instruments are already saved via updateInstruments()
             }
            
             skipQuestion() {
@@ -788,8 +1083,9 @@
             }
            
             async finishCheckIn() {
+                // Prevent double submission
                 if (this.isSubmitting) {
-                    console.log('Already submitting');
+                    console.log('Already submitting, ignoring duplicate call');
                     return;
                 }
                 
@@ -804,15 +1100,20 @@
                 localStorage.setItem('lastCompletedDate', selectedDateString);
                
                 this.updateStreak();
+               
                 this.showCompletionScreen(false);
+                
+                // Reset submission flag after completion
                 this.isSubmitting = false;
             }
            
             async sendToGoogleSheets() {
                 try {
+                    const goalsData = this.getAnswer(8, 'goals');
+                    
                     const formattedData = {
                         timestamp: new Date().toISOString(),
-                        date: this.checkInDate.toLocaleDateString('en-US'),
+                        date: this.checkInDate.toLocaleDateString('en-US'), // Use selected date
                         liftToday: this.getAnswer(1, 'yesno'),
                         meditation: this.getAnswer(2, 'yesno'),
                         readToday: this.getAnswer(3, 'yesno'),
@@ -821,12 +1122,18 @@
                         instrumentsPlayed: this.getAnswer(5, 'instruments'),
                         gatewayTapes: this.getAnswer(6, 'yesno'),
                         artJournal: this.getAnswer(7, 'yesno'),
-                        personalGoal: this.getAnswer(8, 'text'),
+                        // Goal ratings
+                        goal1_songCircle: goalsData.goal1 || '',
+                        goal2_recordOriginal: goalsData.goal2 || '',
+                        goal3_songMeditations: goalsData.goal3 || '',
+                        goal4_youtubePlaylist: goalsData.goal4 || '',
+                        goal5_humanAlchemy: goalsData.goal5 || '',
+                        goal6_storytellingMeditation: goalsData.goal6 || '',
+                        goalOther_text: goalsData.otherGoal || '',
+                        goalOther_rating: goalsData.otherRating || '',
                         gratitude: this.getAnswer(9, 'text'),
                         mostImportant: this.getAnswer(10, 'text')
                     };
-                    
-                    console.log('Sending data:', formattedData);
                    
                     const response = await fetch(this.webhookUrl, {
                         method: 'POST',
@@ -853,46 +1160,78 @@
                 if (field === 'instruments') {
                     return answer.instruments ? answer.instruments.join(', ') : '';
                 }
+                
+                if (field === 'goals') {
+                    return {
+                        goal1: answer.goals?.[0] || 0,
+                        goal2: answer.goals?.[1] || 0,
+                        goal3: answer.goals?.[2] || 0,
+                        goal4: answer.goals?.[3] || 0,
+                        goal5: answer.goals?.[4] || 0,
+                        goal6: answer.goals?.[5] || 0,
+                        otherGoal: answer.otherGoal || '',
+                        otherRating: answer.otherRating || 0
+                    };
+                }
                
                 return answer[field] || '';
             }
            
             updateStreak() {
-                let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
-                const lastDate = localStorage.getItem('lastStreakDate');
-                const today = this.checkInDate.toDateString();
+                const streak = parseInt(localStorage.getItem('streak') || '0');
+                const lastDate = localStorage.getItem('lastCompletedDate');
+                const today = new Date().toDateString();
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
                
-                if (lastDate !== today) {
-                    currentStreak++;
-                    localStorage.setItem('currentStreak', currentStreak);
-                    localStorage.setItem('lastStreakDate', today);
+                if (lastDate === yesterday.toDateString()) {
+                    localStorage.setItem('streak', (streak + 1).toString());
+                } else if (lastDate !== today) {
+                    localStorage.setItem('streak', '1');
                 }
             }
            
-            showCompletionScreen(isReturnVisit) {
-                const streak = localStorage.getItem('currentStreak') || '1';
-                const message = isReturnVisit 
-                    ? "You've already completed your check-in for today. See you tomorrow!"
-                    : "Your reflection has been recorded. May your practice continue to flourish.";
+            showCompletionScreen(alreadyCompleted) {
+                const content = document.getElementById('appContent');
+                const streak = parseInt(localStorage.getItem('streak') || '1');
                
-                document.getElementById('appContent').innerHTML = `
+                content.innerHTML = `
                     <div class="completion-screen">
                         <div class="completion-icon">🌿</div>
-                        <div class="completion-title">Check-In Complete</div>
-                        <div class="completion-message">${message}</div>
-                        <div class="streak-display">
+                        <h2 class="completion-title">${alreadyCompleted ? 'Already Reflected Today' : 'Reflection Complete'}</h2>
+                        <p class="completion-message">
+                            ${alreadyCompleted
+                                ? 'You\'ve already completed your daily check-in. See you tomorrow.'
+                                : 'Thank you for taking time to reflect on your day. Your responses have been saved.'}
+                        </p>
+                        <div class="streak-info">
                             <div class="streak-number">${streak}</div>
                             <div class="streak-label">Day Streak</div>
                         </div>
-                        <button class="nav-btn primary" onclick="window.location.href='dashboard.html'">
-                            View Dashboard
+                        <button class="reset-btn" onclick="app.reset()">
+                            ${alreadyCompleted ? 'View Answers' : 'Start Fresh'}
                         </button>
+                        <div id="webhookStatus" class="webhook-status" style="display: none;"></div>
                     </div>
                 `;
+            }
+           
+            reset() {
+                this.currentQuestion = 0;
+                this.answers = {};
+                document.getElementById('progressFill').style.width = '0%';
+                this.renderQuestion();
             }
         }
        
         const app = new DailyCheckIn();
+       
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHsKICBldmVudC53YWl0VW50aWwoCiAgICBjYWNoZXMub3BlbigncmVmbGVjdGlvbnMtdjEnKS50aGVuKGZ1bmN0aW9uKGNhY2hlKSB7CiAgICAgIHJldHVybiBjYWNoZS5hZGRBbGwoWycvJ10pOwogICAgfSkKICApOwp9KTsKCnNlbGYuYWRkRXZlbnRMaXN0ZW5lcignZmV0Y2gnLCBmdW5jdGlvbihldmVudCkgewogIGV2ZW50LnJlc3BvbmRXaXRoKAogICAgY2FjaGVzLm1hdGNoKGV2ZW50LnJlcXVlc3QpLnRoZW4oZnVuY3Rpb24ocmVzcG9uc2UpIHsKICAgICAgcmV0dXJuIHJlc3BvbnNlIHx8IGZldGNoKGV2ZW50LnJlcXVlc3QpOwogICAgfSkKICApOwp9KTs=')
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
     </script>
 </body>
 </html>
