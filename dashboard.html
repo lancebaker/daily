@@ -679,13 +679,13 @@
             liftToday: 2,
             meditation: 7,
             readToday: 7,
-            course: 3,              // Changed from 7 to 3
+            course: 3,
             instrument: 3,
-            gatewayTapes: 3,        // Changed from 2 to 3
+            gatewayTapes: 3,
             artJournal: 1,
             gratitude: 7,
-            goalPriorities: 7,      // NEW
-            mostImportant: 7        // NEW
+            personalGoal: 1,
+            mostImportant: 1
         };
         
         const LABELS = {
@@ -697,16 +697,8 @@
             gatewayTapes: 'Gateway Tapes',
             artJournal: 'Art Journal',
             gratitude: 'Gratitude',
+            personalGoal: 'Personal Goal',
             mostImportant: 'Most Important'
-        };
-        
-        const GOAL_NAMES = {
-            goal1_songCircle: 'Song Circle Songs',
-            goal2_recordOriginal: 'Record Original Songs',
-            goal3_songMeditations: 'Song Meditations',
-            goal4_youtubePlaylist: 'YouTube Playlist',
-            goal5_humanAlchemy: 'Human Centered Alchemy',
-            goal6_storytellingMeditation: 'Storytelling Meditation'
         };
         
         const TOTAL_POINTS = 35;  // Updated from 36
@@ -1148,7 +1140,7 @@
                 gatewayTapes: 0,
                 artJournal: 0,
                 gratitude: 0,
-                goalPriorities: 0,
+                personalGoal: 0,
                 mostImportant: 0
             };
             
@@ -1164,17 +1156,6 @@
                 if (entry.personalGoal && entry.personalGoal.trim()) counts.personalGoal++;                if (entry.mostImportant && entry.mostImportant.trim()) counts.mostImportant++;
                 
                 // Count if ANY goal was rated (1-5 stars)
-                const hasGoalRating = [
-                    entry.goal1_songCircle,
-                    entry.goal2_recordOriginal,
-                    entry.goal3_songMeditations,
-                    entry.goal4_youtubePlaylist,
-                    entry.goal5_humanAlchemy,
-                    entry.goal6_storytellingMeditation,
-                    entry.goalOther_rating
-                ].some(rating => rating && rating > 0);
-                
-                if (hasGoalRating) counts.goalPriorities++;
                 
                 // Count if mostImportant was answered
                 if (entry.mostImportant && entry.mostImportant.trim()) counts.mostImportant++;
@@ -1210,7 +1191,7 @@
             
             const totals = {
                 liftToday: 0, meditation: 0, readToday: 0, course: 0,
-                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, goalPriorities: 0, mostImportant: 0
+                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, personalGoal: 0, mostImportant: 0
             };
             
             const weekCount = Object.keys(weeklyData).length;
@@ -1218,7 +1199,7 @@
             Object.values(weeklyData).forEach(weekEntries => {
                 const weekCounts = {
                     liftToday: 0, meditation: 0, readToday: 0, course: 0,
-                    instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, goalPriorities: 0, mostImportant: 0
+                    instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, personalGoal: 0, mostImportant: 0
                 };
                 
                 weekEntries.forEach(entry => {
@@ -1233,13 +1214,6 @@
                     if (entry.gratitude && entry.gratitude.trim()) weekCounts.gratitude++;
                     
                     // Count goal priorities if any goal was rated
-                    const hasGoalRating = [
-                        entry.goal1_songCircle, entry.goal2_recordOriginal,
-                        entry.goal3_songMeditations, entry.goal4_youtubePlaylist,
-                        entry.goal5_humanAlchemy, entry.goal6_storytellingMeditation,
-                        entry.goalOther_rating
-                    ].some(rating => rating && rating > 0);
-                    if (hasGoalRating) weekCounts.goalPriorities++;
                     
                     // Count mostImportant if answered
                     if (entry.mostImportant && entry.mostImportant.trim()) weekCounts.mostImportant++;
@@ -1525,13 +1499,6 @@
                 if (entry.gratitude && entry.gratitude.trim()) monthlyStats.gratitude++;
                 
                 // Count goal priorities
-                const hasGoalRating = [
-                    entry.goal1_songCircle, entry.goal2_recordOriginal,
-                    entry.goal3_songMeditations, entry.goal4_youtubePlaylist,
-                    entry.goal5_humanAlchemy, entry.goal6_storytellingMeditation,
-                    entry.goalOther_rating
-                ].some(rating => rating && rating > 0);
-                if (hasGoalRating) monthlyStats.goalPriorities++;
                 
                 // Count mostImportant
                 if (entry.mostImportant && entry.mostImportant.trim()) monthlyStats.mostImportant++;
@@ -1872,7 +1839,7 @@
             // Calculate totals
             const totals = {
                 liftToday: 0, meditation: 0, readToday: 0, course: 0,
-                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, goalPriorities: 0, mostImportant: 0
+                instrument: 0, gatewayTapes: 0, artJournal: 0, gratitude: 0, personalGoal: 0, mostImportant: 0
             };
             
             yearData.forEach(entry => {
@@ -1887,13 +1854,6 @@
                 if (entry.gratitude && entry.gratitude.trim()) totals.gratitude++;
                 
                 // Count goal priorities
-                const hasGoalRating = [
-                    entry.goal1_songCircle, entry.goal2_recordOriginal,
-                    entry.goal3_songMeditations, entry.goal4_youtubePlaylist,
-                    entry.goal5_humanAlchemy, entry.goal6_storytellingMeditation,
-                    entry.goalOther_rating
-                ].some(rating => rating && rating > 0);
-                if (hasGoalRating) totals.goalPriorities++;
                 
                 // Count mostImportant
                 if (entry.mostImportant && entry.mostImportant.trim()) totals.mostImportant++;
