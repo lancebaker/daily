@@ -1134,6 +1134,9 @@
         }
         
         function calculateScore(weekData) {
+            console.log('=== CALCULATE SCORE DEBUG ===');
+            console.log('Week data entries:', weekData.length);
+            
             const counts = {
                 liftToday: 0,
                 meditation: 0,
@@ -1147,23 +1150,37 @@
                 mostImportant: 0
             };
             
-            weekData.forEach(entry => {
+            weekData.forEach((entry, index) => {
+                console.log(`Entry ${index}:`, entry);
+                console.log(`  instrument value: "${entry.instrument}"`);
+                console.log(`  personalGoal value: "${entry.personalGoal}"`);
+                
                 if (entry.liftToday === 'Yes') counts.liftToday++;
                 if (entry.meditation === 'Yes') counts.meditation++;
                 if (entry.readToday === 'Yes') counts.readToday++;
                 if (entry.course === 'Yes') counts.course++;
-                if (entry.instrument === 'Yes') counts.instrument++;
+                if (entry.instrument === 'Yes') {
+                    console.log('  ✓ Instrument counts!');
+                    counts.instrument++;
+                }
                 if (entry.gatewayTapes === 'Yes') counts.gatewayTapes++;
                 if (entry.artJournal === 'Yes') counts.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) counts.gratitude++;
-                if (entry.personalGoal && entry.personalGoal.trim()) counts.personalGoal++;
+                if (entry.personalGoal && entry.personalGoal.trim()) {
+                    console.log('  ✓ Personal Goal counts!');
+                    counts.personalGoal++;
+                }
                 if (entry.mostImportant && entry.mostImportant.trim()) counts.mostImportant++;
             });
+            
+            console.log('Final counts:', counts);
             
             let totalPoints = 0;
             for (let activity in counts) {
                 totalPoints += Math.min(counts[activity], GOALS[activity]);
             }
+            
+            console.log('Total points:', totalPoints, '/', TOTAL_POINTS);
             
             return {
                 points: totalPoints,
