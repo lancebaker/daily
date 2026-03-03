@@ -697,7 +697,6 @@
             gatewayTapes: 'Gateway Tapes',
             artJournal: 'Art Journal',
             gratitude: 'Gratitude',
-            goalPriorities: 'Goal Priorities',
             mostImportant: 'Most Important'
         };
         
@@ -813,61 +812,6 @@
                     </div>
                 </div>
                 ` : ''}
-                
-                ${(() => {
-                    const goalAvgs = calculateGoalAverages(data);
-                    const hasGoalData = Object.values(goalAvgs.averages).some(avg => avg > 0) || goalAvgs.otherGoals.length > 0;
-                    
-                    if (!hasGoalData) return '';
-                    
-                    return `
-                <div class="card">
-                    <h2 style="margin-bottom: 15px; color: #6b5d52; font-family: 'Crimson Pro', serif; font-weight: 400;">Goal Priorities</h2>
-                    <p style="color: #8a7d75; font-size: 0.9rem; margin-bottom: 25px; font-style: italic;">
-                        Average importance ratings across all check-ins
-                    </p>
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        ${Object.keys(GOAL_NAMES).map(key => {
-                            const avg = parseFloat(goalAvgs.averages[key]);
-                            const count = goalAvgs.counts[key];
-                            
-                            if (avg === 0) return '';
-                            
-                            return `
-                                <div style="padding: 20px; background: rgba(168, 181, 160, 0.08); border-radius: 2px; border-left: 3px solid #9e7f61;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                        <div style="font-size: 0.95rem; color: #6b5d52; font-weight: 500;">${GOAL_NAMES[key]}</div>
-                                        <div style="font-size: 1.3rem; font-weight: 600; color: #9e7f61; font-family: 'Crimson Pro', serif;">${avg}</div>
-                                    </div>
-                                    <div style="display: flex; gap: 4px; margin-bottom: 8px;">
-                                        ${[1, 2, 3, 4, 5].map(star => `
-                                            <span style="color: ${star <= Math.round(avg) ? '#d4a574' : 'rgba(158, 127, 97, 0.2)'}; font-size: 1.2rem;">★</span>
-                                        `).join('')}
-                                    </div>
-                                    <div style="font-size: 0.8rem; color: #8a7d75;">Rated ${count} times</div>
-                                </div>
-                            `;
-                        }).filter(x => x).join('')}
-                        
-                        ${goalAvgs.otherGoals.length > 0 ? `
-                            <div style="padding: 20px; background: rgba(212, 165, 116, 0.08); border-radius: 2px; border-left: 3px solid #d4a574;">
-                                <div style="font-weight: 600; color: #6b5d52; margin-bottom: 15px;">Other Goals:</div>
-                                ${goalAvgs.otherGoals.slice(0, 5).map(goal => `
-                                    <div style="margin-bottom: 10px; padding: 12px; background: rgba(255, 255, 255, 0.5); border-radius: 2px;">
-                                        <div style="font-size: 0.9rem; color: #3a3330; margin-bottom: 5px;">${goal.text}</div>
-                                        <div style="display: flex; gap: 3px;">
-                                            ${[1, 2, 3, 4, 5].map(star => `
-                                                <span style="color: ${star <= goal.rating ? '#d4a574' : 'rgba(158, 127, 97, 0.2)'}; font-size: 1rem;">★</span>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-                    `;
-                })()}
                 
                 <!-- Monthly Check-ins (at bottom) -->
                 <div class="card">
@@ -1113,23 +1057,16 @@
                     timestamp: row[0] || '',
                     date: row[1] || '',
                     liftToday: row[2] || '',
-                    meditation: row[3] || '',  // Changed from meditation
+                    meditation: row[3] || '',
                     readToday: row[4] || '',
-                    probabilityCourse: row[5] || '',  // Maps to 'course' in new data
+                    course: row[5] || '',
                     instrument: row[6] || '',
                     instrumentsPlayed: row[7] || '',
                     gatewayTapes: row[8] || '',
                     artJournal: row[9] || '',
-                    goal1_songCircle: parseInt(row[10]) || 0,
-                    goal2_recordOriginal: parseInt(row[11]) || 0,
-                    goal3_songMeditations: parseInt(row[12]) || 0,
-                    goal4_youtubePlaylist: parseInt(row[13]) || 0,
-                    goal5_humanAlchemy: parseInt(row[14]) || 0,
-                    goal6_storytellingMeditation: parseInt(row[15]) || 0,
-                    goalOther_text: row[16] || '',
-                    goalOther_rating: parseInt(row[17]) || 0,
-                    gratitude: row[18] || '',
-                    mostImportant: row[19] || ''
+                    personalGoal: row[10] || '',
+                    gratitude: row[11] || '',
+                    mostImportant: row[12] || ''
                 }));
                 
                 globalData = data;
@@ -1224,6 +1161,7 @@
                 if (entry.gatewayTapes === 'Yes') counts.gatewayTapes++;
                 if (entry.artJournal === 'Yes') counts.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) counts.gratitude++;
+                if (entry.personalGoal && entry.personalGoal.trim()) counts.personalGoal++;                if (entry.mostImportant && entry.mostImportant.trim()) counts.mostImportant++;
                 
                 // Count if ANY goal was rated (1-5 stars)
                 const hasGoalRating = [
@@ -1291,6 +1229,7 @@
                     if (entry.instrument === 'Yes') weekCounts.instrument++;
                     if (entry.gatewayTapes === 'Yes') weekCounts.gatewayTapes++;
                     if (entry.artJournal === 'Yes') weekCounts.artJournal++;
+                    if (entry.personalGoal && entry.personalGoal.trim()) weekCounts.personalGoal++;                    if (entry.mostImportant && entry.mostImportant.trim()) weekCounts.mostImportant++;
                     if (entry.gratitude && entry.gratitude.trim()) weekCounts.gratitude++;
                     
                     // Count goal priorities if any goal was rated
@@ -1347,55 +1286,6 @@
             };
         }
         
-        function calculateGoalAverages(data) {
-            const goalKeys = [
-                'goal1_songCircle',
-                'goal2_recordOriginal',
-                'goal3_songMeditations',
-                'goal4_youtubePlaylist',
-                'goal5_humanAlchemy',
-                'goal6_storytellingMeditation'
-            ];
-            
-            const totals = {};
-            const counts = {};
-            const otherGoals = [];
-            
-            goalKeys.forEach(key => {
-                totals[key] = 0;
-                counts[key] = 0;
-            });
-            
-            data.forEach(entry => {
-                goalKeys.forEach(key => {
-                    const rating = entry[key];
-                    if (rating && rating > 0) {
-                        totals[key] += rating;
-                        counts[key]++;
-                    }
-                });
-                
-                // Track "Other" goals
-                if (entry.goalOther_text && entry.goalOther_rating > 0) {
-                    otherGoals.push({
-                        text: entry.goalOther_text,
-                        rating: entry.goalOther_rating,
-                        date: entry.date
-                    });
-                }
-            });
-            
-            const averages = {};
-            goalKeys.forEach(key => {
-                averages[key] = counts[key] > 0 ? (totals[key] / counts[key]).toFixed(1) : 0;
-            });
-            
-            return {
-                averages,
-                counts,
-                otherGoals
-            };
-        }
         
         function getTreeState(percentage) {
             if (percentage >= 90) {
@@ -1630,6 +1520,7 @@
                 if (entry.course === 'Yes') monthlyStats.course++;
                 if (entry.instrument === 'Yes') monthlyStats.instrument++;
                 if (entry.gatewayTapes === 'Yes') monthlyStats.gatewayTapes++;
+                if (entry.personalGoal && entry.personalGoal.trim()) monthlyStats.personalGoal++;                if (entry.mostImportant && entry.mostImportant.trim()) monthlyStats.mostImportant++;
                 if (entry.artJournal === 'Yes') monthlyStats.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) monthlyStats.gratitude++;
                 
@@ -1990,6 +1881,7 @@
                 if (entry.readToday === 'Yes') totals.readToday++;
                 if (entry.course === 'Yes') totals.course++;
                 if (entry.instrument === 'Yes') totals.instrument++;
+                if (entry.personalGoal && entry.personalGoal.trim()) totals.personalGoal++;                if (entry.mostImportant && entry.mostImportant.trim()) totals.mostImportant++;
                 if (entry.gatewayTapes === 'Yes') totals.gatewayTapes++;
                 if (entry.artJournal === 'Yes') totals.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) totals.gratitude++;
