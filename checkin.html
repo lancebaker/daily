@@ -725,26 +725,9 @@
             
             confirmDate() {
                 const dateInput = document.getElementById('checkInDatePicker');
-                this.checkInDate = new Date(dateInput.value + 'T12:00:00'); // Set to noon to avoid timezone issues
+                this.checkInDate = new Date(dateInput.value + 'T12:00:00');
                 this.dateSelected = true;
-                
-                // Check if already completed for this date
-                this.checkIfCompletedForDate();
-            }
-            
-            checkIfCompletedForDate() {
-                const selectedDateString = this.checkInDate.toDateString();
-                const lastCompleted = localStorage.getItem('lastCompletedDate');
-                
-                if (lastCompleted === selectedDateString) {
-                    if (confirm('You already completed a check-in for this date. Do you want to do it again?')) {
-                        this.renderQuestion();
-                    } else {
-                        this.showDateSelection();
-                    }
-                } else {
-                    this.renderQuestion();
-                }
+                this.renderQuestion();
             }
            
             updateDate() {

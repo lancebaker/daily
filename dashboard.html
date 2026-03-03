@@ -1062,6 +1062,9 @@
                 }));
                 
                 globalData = data;
+                console.log('Loaded data entries:', data.length);
+                console.log('Sample entry:', data[0]);
+                console.log('This week data:', getCurrentWeekData(data));
                 renderThisWeek(data);
                 
             } catch (error) {
@@ -1153,11 +1156,7 @@
                 if (entry.gatewayTapes === 'Yes') counts.gatewayTapes++;
                 if (entry.artJournal === 'Yes') counts.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) counts.gratitude++;
-                if (entry.personalGoal && entry.personalGoal.trim()) counts.personalGoal++;                if (entry.mostImportant && entry.mostImportant.trim()) counts.mostImportant++;
-                
-                // Count if ANY goal was rated (1-5 stars)
-                
-                // Count if mostImportant was answered
+                if (entry.personalGoal && entry.personalGoal.trim()) counts.personalGoal++;
                 if (entry.mostImportant && entry.mostImportant.trim()) counts.mostImportant++;
             });
             
@@ -1210,12 +1209,8 @@
                     if (entry.instrument === 'Yes') weekCounts.instrument++;
                     if (entry.gatewayTapes === 'Yes') weekCounts.gatewayTapes++;
                     if (entry.artJournal === 'Yes') weekCounts.artJournal++;
-                    if (entry.personalGoal && entry.personalGoal.trim()) weekCounts.personalGoal++;                    if (entry.mostImportant && entry.mostImportant.trim()) weekCounts.mostImportant++;
                     if (entry.gratitude && entry.gratitude.trim()) weekCounts.gratitude++;
-                    
-                    // Count goal priorities if any goal was rated
-                    
-                    // Count mostImportant if answered
+                    if (entry.personalGoal && entry.personalGoal.trim()) weekCounts.personalGoal++;
                     if (entry.mostImportant && entry.mostImportant.trim()) weekCounts.mostImportant++;
                 });
                 
@@ -1494,13 +1489,9 @@
                 if (entry.course === 'Yes') monthlyStats.course++;
                 if (entry.instrument === 'Yes') monthlyStats.instrument++;
                 if (entry.gatewayTapes === 'Yes') monthlyStats.gatewayTapes++;
-                if (entry.personalGoal && entry.personalGoal.trim()) monthlyStats.personalGoal++;                if (entry.mostImportant && entry.mostImportant.trim()) monthlyStats.mostImportant++;
                 if (entry.artJournal === 'Yes') monthlyStats.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) monthlyStats.gratitude++;
-                
-                // Count goal priorities
-                
-                // Count mostImportant
+                if (entry.personalGoal && entry.personalGoal.trim()) monthlyStats.personalGoal++;
                 if (entry.mostImportant && entry.mostImportant.trim()) monthlyStats.mostImportant++;
             });
             
@@ -1848,14 +1839,10 @@
                 if (entry.readToday === 'Yes') totals.readToday++;
                 if (entry.course === 'Yes') totals.course++;
                 if (entry.instrument === 'Yes') totals.instrument++;
-                if (entry.personalGoal && entry.personalGoal.trim()) totals.personalGoal++;                if (entry.mostImportant && entry.mostImportant.trim()) totals.mostImportant++;
                 if (entry.gatewayTapes === 'Yes') totals.gatewayTapes++;
                 if (entry.artJournal === 'Yes') totals.artJournal++;
                 if (entry.gratitude && entry.gratitude.trim()) totals.gratitude++;
-                
-                // Count goal priorities
-                
-                // Count mostImportant
+                if (entry.personalGoal && entry.personalGoal.trim()) totals.personalGoal++;
                 if (entry.mostImportant && entry.mostImportant.trim()) totals.mostImportant++;
             });
             
