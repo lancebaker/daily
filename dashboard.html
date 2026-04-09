@@ -462,7 +462,14 @@
             const weekStart = getWeekStart(now);
             
             return data.filter(d => {
-                const entryDate = new Date(d.date);
+                // Parse date correctly - could be ISO string or date string
+                let entryDate;
+                if (d.date.includes('T')) {
+                    // ISO timestamp - extract just the date part
+                    entryDate = new Date(d.date.split('T')[0]);
+                } else {
+                    entryDate = new Date(d.date);
+                }
                 const entryWeekStart = getWeekStart(entryDate);
                 return entryWeekStart.getTime() === weekStart.getTime();
             });
@@ -672,7 +679,14 @@
             const weeks = {};
             
             data.forEach(entry => {
-                const weekStart = getWeekStart(new Date(entry.date));
+                // Parse date correctly
+                let entryDate;
+                if (entry.date.includes('T')) {
+                    entryDate = new Date(entry.date.split('T')[0]);
+                } else {
+                    entryDate = new Date(entry.date);
+                }
+                const weekStart = getWeekStart(entryDate);
                 const weekKey = weekStart.toISOString().split('T')[0];
                 
                 if (!weeks[weekKey]) {
