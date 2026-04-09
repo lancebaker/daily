@@ -4,453 +4,270 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f5f1e8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Daily Check-In v2.0</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Daily Reflections</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
        
-        :root {
-            --cream: #f5f1e8;
-            --warm-white: #fdfcfa;
-            --sage: #9e7f61;
-            --deep-sage: #6b5d52;
-            --soft-green: #a8b5a0;
-            --accent: #d4a574;
-            --text-dark: #3a3330;
-            --text-muted: #8a7d75;
-            --border: rgba(158, 127, 97, 0.15);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --cream: #f5f1e8; --warm-white: #fdfcfa; --sage: #9e7f61;
+            --deep-sage: #6b5d52; --soft-green: #a8b5a0; --text-dark: #3a3330;
+            --text-muted: #8a7d75; --accent: #d4a574; --border: rgba(158, 127, 97, 0.15);
         }
        
         body {
             font-family: 'Lora', serif;
             background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
-            color: var(--text-dark);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--text-dark); min-height: 100vh; display: flex;
+            align-items: center; justify-content: center; padding: 20px;
+            position: relative; overflow-x: hidden;
         }
        
-        .container {
-            width: 100%;
-            max-width: 600px;
+        body::before, body::after {
+            content: ''; position: fixed; border-radius: 50%; pointer-events: none;
         }
+        body::before {
+            top: -50%; right: -10%; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(168, 181, 160, 0.08) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+        body::after {
+            bottom: -30%; left: -10%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(212, 165, 116, 0.06) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite reverse;
+        }
+       
+        .container { max-width: 600px; width: 100%; position: relative; z-index: 1; }
        
         .card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border-radius: 2px; padding: 60px 50px;
             box-shadow: 0 20px 60px rgba(58, 51, 48, 0.08);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border); position: relative; overflow: hidden;
         }
        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.3;
         }
        
+        .header { text-align: center; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
         .date {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-family: 'Crimson Pro', serif;
+            font-family: 'Crimson Pro', serif; font-size: 0.85rem; color: var(--text-muted);
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; font-weight: 300;
         }
-       
         h1 {
-            font-family: 'Crimson Pro', serif;
-            font-size: 2.5rem;
-            font-weight: 300;
-            color: var(--deep-sage);
-            margin-bottom: 10px;
+            font-family: 'Crimson Pro', serif; font-size: 2.5rem; font-weight: 300;
+            color: var(--deep-sage); letter-spacing: 1px; margin-bottom: 10px;
         }
+        .subtitle { font-size: 1rem; color: var(--text-muted); font-style: italic; font-weight: 400; }
        
-        .subtitle {
-            font-style: italic;
-            color: var(--text-muted);
+        /* TRACKER STYLES */
+        .tracker-section {
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px);
+            border-radius: 2px; padding: 40px 35px; margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(58, 51, 48, 0.06); border: 1px solid var(--border);
+            animation: slideIn 0.6s ease-out;
         }
-       
-        .progress-bar {
-            height: 4px;
-            background: var(--border);
-            margin-bottom: 40px;
-            border-radius: 2px;
-            overflow: hidden;
+        .tracker-section.hidden { display: none; }
+        .tracker-title {
+            font-family: 'Crimson Pro', serif; font-size: 1.4rem; color: var(--deep-sage);
+            margin-bottom: 10px; font-weight: 400; letter-spacing: 1px; text-align: center;
         }
-       
-        .progress-fill {
-            height: 100%;
-            background: var(--sage);
-            width: 0%;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        .tracker-subtitle {
+            text-align: center; font-size: 0.9rem; color: var(--text-muted);
+            font-style: italic; margin-bottom: 30px;
         }
-       
-        .question-container {
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .tracker-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .tracker-item {
+            display: flex; align-items: center; padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.6); border: 1.5px solid var(--border);
+            border-radius: 2px; transition: all 0.3s ease; cursor: pointer;
         }
-       
-        .question {
-            text-align: center;
+        .tracker-item:hover { border-color: var(--sage); background: rgba(158, 127, 97, 0.05); }
+        .tracker-item.checked {
+            background: rgba(158, 127, 97, 0.1); border-color: var(--sage);
         }
-       
-        .question-number {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-            font-family: 'Crimson Pro', serif;
+        .tracker-checkbox {
+            width: 24px; height: 24px; margin-right: 15px; cursor: pointer;
+            accent-color: var(--sage);
         }
-       
-        .question-text {
-            font-size: 1.8rem;
-            font-weight: 400;
-            color: var(--deep-sage);
-            margin-bottom: 40px;
-            line-height: 1.4;
+        .tracker-label {
+            font-family: 'Lora', serif; font-size: 1rem; color: var(--text-dark);
+            cursor: pointer; flex: 1;
         }
-       
-        .answer-group {
-            margin-top: 20px;
+        .tracker-item.checked .tracker-label { color: var(--deep-sage); font-weight: 600; }
+        .complete-checkin-btn {
+            width: 100%; padding: 18px; background: var(--sage); border: none;
+            color: var(--warm-white); font-family: 'Crimson Pro', serif; font-size: 1rem;
+            cursor: pointer; transition: all 0.4s ease; letter-spacing: 1px;
+            text-transform: uppercase; font-weight: 600;
         }
-       
-        .yes-no-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-       
-        .answer-btn {
-            flex: 1;
-            max-width: 200px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.5);
-            border: 1.5px solid var(--border);
-            color: var(--text-dark);
-            font-family: 'Crimson Pro', serif;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-        }
-       
-        .answer-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--sage);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 0;
-        }
-       
-        .answer-btn span {
-            position: relative;
-            z-index: 1;
-        }
-       
-        @media (hover: hover) and (pointer: fine) {
-            .answer-btn:hover::before {
-                transform: scaleX(1);
-            }
-           
-            .answer-btn:hover {
-                color: var(--warm-white);
-                border-color: var(--sage);
-            }
-        }
-       
-        .answer-btn.selected {
-            background: var(--sage);
-            border-color: var(--sage);
-            color: var(--warm-white);
-            font-weight: 600;
-        }
-       
-        .answer-btn.selected::before {
-            transform: scaleX(1);
-        }
-
-        .instrument-selector {
-            display: none;
-            margin-top: 20px;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.5);
-            border: 1.5px solid var(--border);
-            border-radius: 2px;
-            animation: slideIn 0.4s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .instrument-selector.visible {
-            display: block;
-        }
-
-        .instrument-label {
-            font-family: 'Crimson Pro', serif;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .instrument-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-        }
-
-        .instrument-option {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.6);
-            border: 1.5px solid var(--border);
-            border-radius: 2px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .instrument-option:hover {
-            border-color: var(--sage);
-            background: rgba(158, 127, 97, 0.1);
-        }
-
-        .instrument-option input[type="checkbox"] {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        .instrument-option label {
-            font-family: 'Lora', serif;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            cursor: pointer;
-            user-select: none;
-        }
-       
-        .text-input-container {
-            position: relative;
-        }
-        
-        .examples-text {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-bottom: 15px;
-            text-align: center;
-            line-height: 1.6;
-        }
-       
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.5);
-            border: 1.5px solid var(--border);
-            color: var(--text-dark);
-            font-family: 'Lora', serif;
-            font-size: 1rem;
-            resize: vertical;
-            transition: all 0.3s ease;
-            line-height: 1.7;
-        }
-       
-        textarea:focus {
-            outline: none;
-            border-color: var(--sage);
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 5px 20px rgba(158, 127, 97, 0.1);
-        }
-       
-        textarea::placeholder {
-            color: var(--text-muted);
-            font-style: italic;
-        }
-       
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 40px;
-            gap: 20px;
-        }
-       
-        .nav-btn {
-            padding: 15px 35px;
-            background: transparent;
-            border: 1.5px solid var(--border);
-            color: var(--text-dark);
-            font-family: 'Crimson Pro', serif;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-       
-        .nav-btn:hover:not(:disabled) {
-            background: var(--sage);
-            border-color: var(--sage);
-            color: var(--warm-white);
-            transform: translateY(-2px);
+        .complete-checkin-btn:hover {
+            background: var(--deep-sage); transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(158, 127, 97, 0.15);
         }
        
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        /* Regular check-in styles */
+        .progress-bar {
+            width: 100%; height: 2px; background: var(--border); margin-bottom: 40px;
+            position: relative; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--sage), var(--accent));
+            width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .question-container {
+            min-height: 300px; display: flex; flex-direction: column; justify-content: center;
+        }
+        .question { opacity: 0; animation: slideIn 0.6s ease-out forwards; }
+        .question-number {
+            font-family: 'Crimson Pro', serif; font-size: 0.75rem; color: var(--text-muted);
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; font-weight: 600;
+        }
+        .question-text {
+            font-size: 1.6rem; color: var(--text-dark); margin-bottom: 40px;
+            line-height: 1.6; font-weight: 400;
+        }
+        .answer-group { display: flex; flex-direction: column; gap: 20px; }
+        .yes-no-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .answer-btn {
+            flex: 1; padding: 18px 30px; background: transparent;
+            border: 1.5px solid var(--border); color: var(--text-dark);
+            font-family: 'Lora', serif; font-size: 1rem; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
+        }
+        .answer-btn::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--sage); transform: scaleX(0); transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 0;
+        }
+        .answer-btn span { position: relative; z-index: 1; }
+        .answer-btn:hover::before { transform: scaleX(1); }
+        .answer-btn:hover { color: var(--warm-white); border-color: var(--sage); }
+        .answer-btn.selected {
+            background: var(--sage); border-color: var(--sage);
+            color: var(--warm-white); font-weight: 600;
+        }
+        .answer-btn.selected::before { transform: scaleX(1); }
+       
+        .instrument-selector {
+            display: none; margin-top: 20px; padding: 25px;
+            background: rgba(255, 255, 255, 0.5); border: 1.5px solid var(--border);
+            border-radius: 2px; animation: slideIn 0.4s ease-out;
+        }
+        .instrument-selector.visible { display: block; }
+        .instrument-label {
+            font-family: 'Crimson Pro', serif; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted);
+            margin-bottom: 15px; font-weight: 600;
+        }
+        .instrument-options {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;
+        }
+        .instrument-option {
+            display: flex; align-items: center; padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.6); border: 1.5px solid var(--border);
+            border-radius: 2px; cursor: pointer; transition: all 0.3s ease;
+        }
+        .instrument-option:hover {
+            border-color: var(--sage); background: rgba(158, 127, 97, 0.1);
+        }
+        .instrument-option input[type="checkbox"] { margin-right: 10px; cursor: pointer; }
+        .instrument-option label {
+            font-family: 'Lora', serif; font-size: 0.95rem; color: var(--text-dark);
+            cursor: pointer; user-select: none;
         }
        
+        textarea {
+            width: 100%; min-height: 120px; padding: 20px;
+            background: rgba(255, 255, 255, 0.5); border: 1.5px solid var(--border);
+            color: var(--text-dark); font-family: 'Lora', serif; font-size: 1rem;
+            resize: vertical; transition: all 0.3s ease; line-height: 1.7;
+        }
+        textarea:focus {
+            outline: none; border-color: var(--sage); background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 20px rgba(158, 127, 97, 0.1);
+        }
+        textarea::placeholder { color: var(--text-muted); font-style: italic; }
+       
+        .navigation {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 40px; gap: 20px;
+        }
+        .nav-btn {
+            padding: 15px 35px; background: transparent; border: 1.5px solid var(--border);
+            color: var(--text-dark); font-family: 'Crimson Pro', serif; font-size: 0.95rem;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
+        }
+        .nav-btn:hover:not(:disabled) {
+            background: var(--sage); border-color: var(--sage); color: var(--warm-white);
+            transform: translateY(-2px); box-shadow: 0 10px 25px rgba(158, 127, 97, 0.15);
+        }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .nav-btn.primary {
-            background: var(--sage);
-            border-color: var(--sage);
-            color: var(--warm-white);
+            background: var(--sage); border-color: var(--sage); color: var(--warm-white);
         }
-       
         .nav-btn.primary:hover:not(:disabled) {
-            background: var(--deep-sage);
-            border-color: var(--deep-sage);
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(107, 93, 82, 0.2);
-        }
-
-        .skip-btn {
-            padding: 10px 20px;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-family: 'Lora', serif;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-style: italic;
-            text-decoration: underline;
-        }
-
-        .skip-btn:hover {
-            color: var(--sage);
+            background: var(--deep-sage); border-color: var(--deep-sage);
         }
        
-        .completion-screen {
-            text-align: center;
-            padding: 60px 20px;
-        }
-       
+        .completion-screen { text-align: center; padding: 40px 0; animation: fadeIn 1s ease-out; }
         .completion-icon {
-            font-size: 4rem;
-            margin-bottom: 30px;
+            font-size: 4rem; margin-bottom: 30px;
+            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-       
         .completion-title {
-            font-family: 'Crimson Pro', serif;
-            font-size: 2rem;
-            color: var(--deep-sage);
-            margin-bottom: 15px;
-            font-weight: 400;
+            font-family: 'Crimson Pro', serif; font-size: 2rem; color: var(--deep-sage);
+            margin-bottom: 15px; font-weight: 400;
         }
-       
         .completion-message {
-            color: var(--text-muted);
-            font-style: italic;
-            margin-bottom: 40px;
-            line-height: 1.8;
+            font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.7;
         }
-       
-        .streak-display {
-            display: inline-block;
-            padding: 20px 40px;
-            background: rgba(168, 181, 160, 0.15);
-            border-radius: 2px;
-            margin-bottom: 40px;
+        .streak-info {
+            display: inline-block; padding: 15px 30px; background: rgba(168, 181, 160, 0.1);
+            border: 1px solid var(--border); border-radius: 2px; margin-bottom: 30px;
         }
-       
         .streak-number {
-            font-family: 'Crimson Pro', serif;
-            font-size: 3rem;
-            font-weight: 600;
-            color: var(--sage);
+            font-family: 'Crimson Pro', serif; font-size: 2rem; color: var(--sage); font-weight: 600;
+        }
+        .streak-label {
+            font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .reset-btn {
+            padding: 15px 40px; background: transparent; border: 1.5px solid var(--sage);
+            color: var(--sage); font-family: 'Crimson Pro', serif; font-size: 0.95rem;
+            cursor: pointer; transition: all 0.4s ease; letter-spacing: 1px;
+            text-transform: uppercase; font-weight: 600;
+        }
+        .reset-btn:hover {
+            background: var(--sage); color: var(--warm-white); transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(158, 127, 97, 0.15);
         }
        
-        .streak-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 5px;
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn { from { transform: scale(0); } to { transform: scale(1); } }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(5deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
         }
        
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-           
-            .question-text {
-                font-size: 1.4rem;
-            }
-           
-            .card {
-                padding: 30px 20px;
-            }
-           
-            .yes-no-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-           
-            .answer-btn {
-                max-width: 100%;
-            }
-           
-            .navigation {
-                flex-direction: column;
-                gap: 15px;
-            }
-           
-            .nav-btn {
-                width: 100%;
-            }
-
-            .instrument-options {
-                grid-template-columns: 1fr;
-            }
+            .card { padding: 40px 30px; }
+            h1 { font-size: 2rem; }
+            .question-text { font-size: 1.3rem; }
+            .yes-no-container { flex-direction: column; }
+            .navigation { flex-direction: column; gap: 15px; }
+            .nav-btn { width: 100%; }
+            .instrument-options { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -467,110 +284,122 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
            
-            <div id="appContent">
-                <!-- Questions will be rendered here -->
-            </div>
+            <div id="appContent"></div>
         </div>
     </div>
  
     <script>
         class DailyCheckIn {
             constructor() {
-                this.webhookUrl = 'https://script.google.com/macros/s/AKfycbzdfTL4cGMl1Lzf4EZUEf2ozXBt_Do9Ed0XRO5xyP2U4SR6VYw9_i92LIrdvcVg4Ixt-w/exec';
-               
+                this.webhookUrl = 'https://script.google.com/macros/s/AKfycbwZ39x0Nt7uUm6WI-HSkloMvwPosaMZLA7tXZm0FVh5B9-9IRamjUNHDwzfgpZbDXHmAA/exec';
                 this.questions = [
                     { id: 1, text: "Did you lift today?", type: "yesno" },
-                    { id: 2, text: "Did you meditate today? (HeartMath or Nova)", type: "yesno" },
+                    { id: 2, text: "Did you do HeartMath today?", type: "yesno" },
                     { id: 3, text: "Did you read today?", type: "yesno" },
-                    { id: 4, text: "Did you do a course today?", type: "yesno" },
-                    { 
-                        id: 5, 
-                        text: "Did you play an instrument today?", 
-                        type: "yesno",
-                        hasSubQuestion: true,
-                        instruments: ["Guitar", "Violin", "Flute", "Handpan", "Harmonium", "Banjo"]
+                    { id: 4, text: "Did you do probability course today?", type: "yesno" },
+                    { id: 5, text: "Did you play an instrument today?", type: "yesno", hasSubQuestion: true,
+                      instruments: ["Guitar", "Violin", "Flute", "Handpan", "Harmonium", "Banjo"]
                     },
                     { id: 6, text: "Did you do the Gateway Tapes today?", type: "yesno" },
                     { id: 7, text: "Did you do your Art Journal?", type: "yesno" },
-                    { 
-                        id: 8, 
-                        text: "What personal goal feels most important to you right now?",
-                        examples: "e.g. new song circle songs, record original songs, new song meditations (Suno), create YouTube playlist for circle, storytelling, etc.",
-                        type: "text"
-                    },
-                    { id: 9, text: "What are you grateful for today?", type: "text" },
-                    { id: 10, text: "What feels most important to you right now?", type: "text" }
+                    { id: 8, text: "What are you grateful for today?", type: "text" }
                 ];
-               
                 this.currentQuestion = 0;
                 this.answers = {};
-                this.checkInDate = new Date();
-                this.dateSelected = false;
-                this.isSubmitting = false;
+                this.showingTracker = true;
+                this.trackerData = null;
                 this.init();
             }
            
             init() {
                 this.updateDate();
-                this.showDateSelection();
-            }
-            
-            showDateSelection() {
-                const content = document.getElementById('appContent');
-                const today = new Date().toISOString().split('T')[0];
-                
-                content.innerHTML = `
-                    <div class="question-container">
-                        <div class="question">
-                            <div class="question-text" style="text-align: center; margin-bottom: 30px;">
-                                When would you like to check in for?
-                            </div>
-                            <div style="text-align: center; margin-bottom: 30px;">
-                                <input type="date" 
-                                       id="checkInDatePicker" 
-                                       value="${today}"
-                                       max="${today}"
-                                       style="padding: 15px 20px; font-size: 1rem; border: 1.5px solid var(--border); background: rgba(255, 255, 255, 0.8); color: var(--text-dark); font-family: 'Lora', serif; border-radius: 2px; cursor: pointer;">
-                            </div>
-                            <div style="text-align: center; color: var(--text-muted); font-size: 0.9rem; font-style: italic; margin-bottom: 20px;">
-                                Select today for your current check-in, or choose a past date to fill in a missed day
-                            </div>
-                        </div>
-                    </div>
-                    <div class="navigation" style="justify-content: center;">
-                        <button class="nav-btn primary" onclick="app.confirmDate()">
-                            Continue
-                        </button>
-                    </div>
-                `;
-            }
-            
-            confirmDate() {
-                const dateInput = document.getElementById('checkInDatePicker');
-                this.checkInDate = new Date(dateInput.value + 'T12:00:00');
-                this.dateSelected = true;
-                this.checkIfCompletedForDate();
-            }
-            
-            checkIfCompletedForDate() {
-                const selectedDateString = this.checkInDate.toDateString();
-                const lastCompleted = localStorage.getItem('lastCompletedDate');
-                
-                if (lastCompleted === selectedDateString) {
-                    if (confirm('You already completed a check-in for this date. Do you want to do it again?')) {
-                        this.renderQuestion();
-                    } else {
-                        this.showDateSelection();
-                    }
-                } else {
-                    this.renderQuestion();
-                }
+                this.checkIfCompletedToday();
+                this.loadTodayTracker();
             }
            
             updateDate() {
                 const now = new Date();
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+            }
+           
+            checkIfCompletedToday() {
+                const lastCompleted = localStorage.getItem('lastCompletedDate');
+                const today = new Date().toDateString();
+                if (lastCompleted === today) {
+                    this.showCompletionScreen(true);
+                }
+            }
+           
+            async loadTodayTracker() {
+                try {
+                    const response = await fetch(this.webhookUrl + '?action=getTracker');
+                    const data = await response.json();
+                    this.trackerData = data;
+                    this.renderTracker();
+                } catch (error) {
+                    console.error('Error loading tracker:', error);
+                    this.showingTracker = false;
+                    this.renderQuestion();
+                }
+            }
+           
+            renderTracker() {
+                const content = document.getElementById('appContent');
+                content.innerHTML = `
+                    <div class="tracker-section">
+                        <div class="tracker-title">Today's Progress</div>
+                        <div class="tracker-subtitle">Check off practices as you complete them</div>
+                        <div class="tracker-list">
+                            ${this.renderTrackerItem('liftToday', 'Lift')}
+                            ${this.renderTrackerItem('heartMath', 'HeartMath')}
+                            ${this.renderTrackerItem('readToday', 'Read')}
+                            ${this.renderTrackerItem('probabilityCourse', 'Probability Course')}
+                            ${this.renderTrackerItem('instrument', 'Instrument')}
+                            ${this.renderTrackerItem('gatewayTapes', 'Gateway Tapes')}
+                            ${this.renderTrackerItem('artJournal', 'Art Journal')}
+                        </div>
+                        <button class="complete-checkin-btn" onclick="app.startEveningCheckIn()">
+                            Complete Evening Check-In
+                        </button>
+                    </div>
+                `;
+            }
+           
+            renderTrackerItem(field, label) {
+                const checked = this.trackerData[field];
+                return `
+                    <div class="tracker-item ${checked ? 'checked' : ''}" onclick="app.toggleTracker('${field}')">
+                        <input type="checkbox" class="tracker-checkbox" ${checked ? 'checked' : ''} 
+                               onclick="event.stopPropagation(); app.toggleTracker('${field}')">
+                        <label class="tracker-label">${label}</label>
+                    </div>
+                `;
+            }
+           
+            async toggleTracker(field) {
+                const newValue = !this.trackerData[field];
+                this.trackerData[field] = newValue;
+                try {
+                    await fetch(this.webhookUrl + `?action=updateTracker&field=${field}&value=${newValue}`);
+                } catch (error) {
+                    console.error('Error updating tracker:', error);
+                }
+                this.renderTracker();
+            }
+           
+            startEveningCheckIn() {
+                this.answers = {};
+                if (this.trackerData.liftToday) this.answers[1] = { yesno: true };
+                if (this.trackerData.heartMath) this.answers[2] = { yesno: true };
+                if (this.trackerData.readToday) this.answers[3] = { yesno: true };
+                if (this.trackerData.probabilityCourse) this.answers[4] = { yesno: true };
+                if (this.trackerData.instrument) this.answers[5] = { yesno: true, instruments: [] };
+                if (this.trackerData.gatewayTapes) this.answers[6] = { yesno: true };
+                if (this.trackerData.artJournal) this.answers[7] = { yesno: true };
+                this.showingTracker = false;
+                this.currentQuestion = 0;
+                this.renderQuestion();
             }
            
             renderQuestion() {
@@ -619,45 +448,24 @@
                         </div>
                         ${this.currentQuestion > 0 ? `
                         <div class="navigation">
-                            <button class="nav-btn" onclick="app.previousQuestion()">
-                                Back
-                            </button>
+                            <button class="nav-btn" onclick="app.previousQuestion()">Back</button>
                         </div>
                         ` : ''}
                     `;
                 } else {
-                    const placeholders = {
-                        8: "Share what's on your mind...",
-                        9: "Take a moment to reflect...",
-                        10: "What's calling for your attention?"
-                    };
-                    const placeholder = placeholders[question.id] || "Your thoughts...";
-                    
-                    const examplesHtml = question.examples ? `
-                        <div class="examples-text">${question.examples}</div>
-                    ` : '';
-                    
                     content.innerHTML = `
                         <div class="question-container">
                             <div class="question">
                                 <div class="question-number">Question ${this.currentQuestion + 1} of ${this.questions.length}</div>
                                 <div class="question-text">${question.text}</div>
-                                ${examplesHtml}
                                 <div class="answer-group">
-                                    <div class="text-input-container">
-                                        <textarea id="textInput-${question.id}" placeholder="${placeholder}" style="min-height: 150px;"></textarea>
-                                    </div>
+                                    <textarea id="gratitudeInput" placeholder="Take a moment to reflect..." style="min-height: 150px;"></textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="navigation">
-                            <button class="nav-btn" onclick="app.previousQuestion()">
-                                Back
-                            </button>
-                            <button class="skip-btn" onclick="app.skipQuestion()">Skip question</button>
-                            <button class="nav-btn primary" onclick="app.${this.currentQuestion === this.questions.length - 1 ? 'finishCheckIn' : 'nextQuestion'}()">
-                                ${this.currentQuestion === this.questions.length - 1 ? 'Complete' : 'Continue'}
-                            </button>
+                            <button class="nav-btn" onclick="app.previousQuestion()">Back</button>
+                            <button class="nav-btn primary" onclick="app.finishCheckIn()">Complete</button>
                         </div>
                     `;
                 }
@@ -682,8 +490,8 @@
                         });
                     }
                     if (answer.text) {
-                        const textInput = document.getElementById(`textInput-${question.id}`);
-                        if (textInput) textInput.value = answer.text;
+                        const gratitudeInput = document.getElementById('gratitudeInput');
+                        if (gratitudeInput) gratitudeInput.value = answer.text;
                     }
                 }
             }
@@ -691,24 +499,6 @@
             selectYesNo(value) {
                 const buttons = document.querySelectorAll('.answer-btn');
                 buttons.forEach(btn => btn.classList.remove('selected'));
-                
-                const question = this.questions[this.currentQuestion];
-                
-                // INSTRUMENT DEBUG
-                if (question.id === 5) {
-                    console.log('=== INSTRUMENT QUESTION ===');
-                    console.log('Clicked:', value ? 'YES' : 'NO');
-                }
-                
-                if (!this.answers[question.id]) {
-                    this.answers[question.id] = {};
-                }
-                this.answers[question.id].yesno = value;
-                
-                // INSTRUMENT DEBUG
-                if (question.id === 5) {
-                    console.log('Saved to answers:', this.answers[question.id]);
-                }
                
                 if (value) {
                     buttons[0].classList.add('selected');
@@ -720,18 +510,16 @@
                 } else {
                     buttons[1].classList.add('selected');
                     const instrumentSelector = document.getElementById('instrumentSelector');
-                    if (instrumentSelector) {
-                        instrumentSelector.classList.remove('visible');
-                    }
-                    if (question.hasSubQuestion) {
-                        this.answers[question.id].instruments = [];
-                    }
+                    if (instrumentSelector) instrumentSelector.classList.remove('visible');
                 }
+               
+                const question = this.questions[this.currentQuestion];
+                if (!this.answers[question.id]) this.answers[question.id] = {};
+                this.answers[question.id].yesno = value;
+                if (!value && question.hasSubQuestion) this.answers[question.id].instruments = [];
 
-                if (!question.hasSubQuestion || !value) {
-                    setTimeout(() => {
-                        this.nextQuestion();
-                    }, 300);
+                if (!question.hasSubQuestion) {
+                    setTimeout(() => this.nextQuestion(), 300);
                 }
             }
 
@@ -742,52 +530,25 @@
                 const selected = [];
                 question.instruments.forEach(inst => {
                     const checkbox = document.getElementById(`inst_${inst}`);
-                    if (checkbox && checkbox.checked) {
-                        selected.push(inst);
-                    }
+                    if (checkbox && checkbox.checked) selected.push(inst);
                 });
 
-                // Don't overwrite existing answer object - just add instruments to it
-                if (!this.answers[question.id]) {
-                    this.answers[question.id] = { yesno: true }; // Default to true since we're selecting instruments
-                }
+                if (!this.answers[question.id]) this.answers[question.id] = {};
                 this.answers[question.id].instruments = selected;
-                
-                console.log('Instrument answer saved:', this.answers[question.id]);
-                
-                if (selected.length > 0) {
-                    setTimeout(() => {
-                        this.nextQuestion();
-                    }, 400);
-                }
             }
            
             saveCurrentAnswer() {
                 const question = this.questions[this.currentQuestion];
-               
                 if (question.type === 'text') {
-                    const textInput = document.getElementById(`textInput-${question.id}`);
-                    if (textInput && textInput.value.trim()) {
-                        this.answers[question.id] = {
-                            text: textInput.value.trim()
-                        };
+                    const gratitudeInput = document.getElementById('gratitudeInput');
+                    if (gratitudeInput && gratitudeInput.value.trim()) {
+                        this.answers[question.id] = { text: gratitudeInput.value.trim() };
                     }
-                }
-            }
-           
-            skipQuestion() {
-                this.saveCurrentAnswer();
-                if (this.currentQuestion < this.questions.length - 1) {
-                    this.currentQuestion++;
-                    this.renderQuestion();
-                } else {
-                    this.finishCheckIn();
                 }
             }
            
             nextQuestion() {
                 this.saveCurrentAnswer();
-               
                 if (this.currentQuestion < this.questions.length - 1) {
                     this.currentQuestion++;
                     this.renderQuestion();
@@ -798,7 +559,6 @@
            
             previousQuestion() {
                 this.saveCurrentAnswer();
-               
                 if (this.currentQuestion > 0) {
                     this.currentQuestion--;
                     this.renderQuestion();
@@ -806,55 +566,37 @@
             }
            
             async finishCheckIn() {
-                if (this.isSubmitting) {
-                    console.log('Already submitting');
-                    return;
-                }
-                
-                this.isSubmitting = true;
                 this.saveCurrentAnswer();
-               
                 document.getElementById('progressFill').style.width = '100%';
-               
                 await this.sendToGoogleSheets();
-               
-                const selectedDateString = this.checkInDate.toDateString();
-                localStorage.setItem('lastCompletedDate', selectedDateString);
-               
+                const today = new Date().toDateString();
+                localStorage.setItem('lastCompletedDate', today);
                 this.updateStreak();
                 this.showCompletionScreen(false);
-                this.isSubmitting = false;
             }
            
             async sendToGoogleSheets() {
                 try {
                     const formattedData = {
                         timestamp: new Date().toISOString(),
-                        date: this.checkInDate.toLocaleDateString('en-US'),
+                        date: new Date().toLocaleDateString('en-US'),
                         liftToday: this.getAnswer(1, 'yesno'),
-                        meditation: this.getAnswer(2, 'yesno'),
+                        heartMath: this.getAnswer(2, 'yesno'),
                         readToday: this.getAnswer(3, 'yesno'),
-                        course: this.getAnswer(4, 'yesno'),
+                        probabilityCourse: this.getAnswer(4, 'yesno'),
                         instrument: this.getAnswer(5, 'yesno'),
                         instrumentsPlayed: this.getAnswer(5, 'instruments'),
                         gatewayTapes: this.getAnswer(6, 'yesno'),
                         artJournal: this.getAnswer(7, 'yesno'),
-                        personalGoal: this.getAnswer(8, 'text'),
-                        gratitude: this.getAnswer(9, 'text'),
-                        mostImportant: this.getAnswer(10, 'text')
+                        gratitude: this.getAnswer(8, 'text')
                     };
-                    
-                    console.log('Sending data:', formattedData);
                    
-                    const response = await fetch(this.webhookUrl, {
+                    await fetch(this.webhookUrl, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(formattedData)
                     });
-                   
                 } catch (error) {
                     console.error('Error sending to Google Sheets:', error);
                 }
@@ -862,60 +604,60 @@
            
             getAnswer(questionId, field) {
                 const answer = this.answers[questionId];
-                
-                if (questionId === 5 && field === 'yesno') {
-                    console.log(`Getting instrument yesno - answer object:`, answer);
-                }
-                
                 if (!answer) return '';
-               
                 if (field === 'yesno') {
-                    const result = answer.yesno === true ? 'Yes' : answer.yesno === false ? 'No' : '';
-                    if (questionId === 5) {
-                        console.log(`Instrument yesno result: "${result}"`);
-                    }
-                    return result;
+                    return answer.yesno === true ? 'Yes' : answer.yesno === false ? 'No' : '';
                 }
-
                 if (field === 'instruments') {
                     return answer.instruments ? answer.instruments.join(', ') : '';
                 }
-               
                 return answer[field] || '';
             }
            
             updateStreak() {
-                let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
-                const lastDate = localStorage.getItem('lastStreakDate');
-                const today = this.checkInDate.toDateString();
+                const streak = parseInt(localStorage.getItem('streak') || '0');
+                const lastDate = localStorage.getItem('lastCompletedDate');
+                const today = new Date().toDateString();
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
                
-                if (lastDate !== today) {
-                    currentStreak++;
-                    localStorage.setItem('currentStreak', currentStreak);
-                    localStorage.setItem('lastStreakDate', today);
+                if (lastDate === yesterday.toDateString()) {
+                    localStorage.setItem('streak', (streak + 1).toString());
+                } else if (lastDate !== today) {
+                    localStorage.setItem('streak', '1');
                 }
             }
            
-            showCompletionScreen(isReturnVisit) {
-                const streak = localStorage.getItem('currentStreak') || '1';
-                const message = isReturnVisit 
-                    ? "You've already completed your check-in for today. See you tomorrow!"
-                    : "Your reflection has been recorded. May your practice continue to flourish.";
+            showCompletionScreen(alreadyCompleted) {
+                const content = document.getElementById('appContent');
+                const streak = parseInt(localStorage.getItem('streak') || '1');
                
-                document.getElementById('appContent').innerHTML = `
+                content.innerHTML = `
                     <div class="completion-screen">
                         <div class="completion-icon">🌿</div>
-                        <div class="completion-title">Check-In Complete</div>
-                        <div class="completion-message">${message}</div>
-                        <div class="streak-display">
+                        <h2 class="completion-title">${alreadyCompleted ? 'Already Reflected Today' : 'Reflection Complete'}</h2>
+                        <p class="completion-message">
+                            ${alreadyCompleted
+                                ? 'You\'ve already completed your daily check-in. See you tomorrow.'
+                                : 'Thank you for taking time to reflect on your day. Your responses have been saved.'}
+                        </p>
+                        <div class="streak-info">
                             <div class="streak-number">${streak}</div>
                             <div class="streak-label">Day Streak</div>
                         </div>
-                        <button class="nav-btn primary" onclick="window.location.href='dashboard.html'">
-                            View Dashboard
+                        <button class="reset-btn" onclick="app.reset()">
+                            ${alreadyCompleted ? 'View Answers' : 'Start Fresh'}
                         </button>
                     </div>
                 `;
+            }
+           
+            reset() {
+                this.currentQuestion = 0;
+                this.answers = {};
+                this.showingTracker = true;
+                document.getElementById('progressFill').style.width = '0%';
+                this.loadTodayTracker();
             }
         }
        
