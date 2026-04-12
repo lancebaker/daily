@@ -333,12 +333,20 @@
            
             async loadTodayTracker() {
                 try {
-                    const response = await fetch(this.webhookUrl + '?action=getTracker');
+                    // Set a 3 second timeout for tracker loading
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Timeout')), 3000)
+                    );
+                    
+                    const fetchPromise = fetch(this.webhookUrl + '?action=getTracker');
+                    
+                    const response = await Promise.race([fetchPromise, timeoutPromise]);
                     const data = await response.json();
                     this.trackerData = data;
                     this.renderTracker();
                 } catch (error) {
-                    console.error('Error loading tracker:', error);
+                    console.log('Tracker loading timed out or failed, showing check-in form');
+                    // If tracker fails or times out, skip to check-in
                     this.showingTracker = false;
                     this.renderQuestion();
                 }
@@ -346,10 +354,19 @@
            
             renderTracker() {
                 const content = document.getElementById('appContent');
+                const today = new Date().toISOString().split('T')[0];
+                
                 content.innerHTML = `
                     <div class="tracker-section">
                         <div class="tracker-title">Today's Progress</div>
                         <div class="tracker-subtitle">Check off practices as you complete them</div>
+                        
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <label style="font-size: 0.9rem; color: var(--text-muted); margin-right: 10px;">Check-in Date:</label>
+                            <input type="date" id="checkinDate" value="${today}" 
+                                   style="padding: 8px 15px; border: 1.5px solid var(--border); font-family: 'Lora', serif; font-size: 0.95rem;">
+                        </div>
+                        
                         <div class="tracker-list">
                             ${this.renderTrackerItem('liftToday', 'Lift')}
                             ${this.renderTrackerItem('heartMath', 'HeartMath')}
@@ -577,9 +594,13 @@
            
             async sendToGoogleSheets() {
                 try {
+                    // Get the selected date from the date picker if it exists
+                    const dateInput = document.getElementById('checkinDate');
+                    const selectedDate = dateInput ? new Date(dateInput.value + 'T12:00:00') : new Date();
+                    
                     const formattedData = {
                         timestamp: new Date().toISOString(),
-                        date: new Date().toLocaleDateString('en-US'),
+                        date: selectedDate.toLocaleDateString('en-US'),
                         liftToday: this.getAnswer(1, 'yesno'),
                         heartMath: this.getAnswer(2, 'yesno'),
                         readToday: this.getAnswer(3, 'yesno'),
